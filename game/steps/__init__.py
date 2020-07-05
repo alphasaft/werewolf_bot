@@ -1,0 +1,12 @@
+import game.steps.nicknames_step
+import game.steps.begin_step
+import game.steps.steps_list
+import game.steps.lovemaker_step
+import game.steps.seeker_step
+import game.steps.werewolfs_step
+import game.steps.witch_step
+import game.steps.hunter_step
+import game.steps.death_summary_step
+import game.steps.vote_step
+import game.steps.dusk_step
+import game.steps.end_step

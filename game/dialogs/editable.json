@@ -1,0 +1,79 @@
+{
+    "everyone": {
+        "sleep": "Message affiché lorque le village s'endort"
+    },
+
+    "witch": {
+        "tell_role": "Message annoncant le rôle de la sorcière au joueur.",
+        "wakes_up": "Message envoyé à tous les joueurs (la sorcière s'éveille).",
+    },
+
+    "werewolf": {
+        "tell_role": [
+            "Vous vous réveillez au milieu de la nuit. Vos yeux rouges luisent étrangement dans le noir. Vous avez faim. Très faim.\n[VOUS ÊTES UN LOUP-GAROU. TUEZ TOUS LES VILLAGEOIS POUR GAGNER]"
+        ]
+    },
+
+    "lovemaker": {
+        "tell_role": [
+            "Vous étiez là incognito. Vous les avez longtemps observés pour être sûr de votre choix. Maintenant, il est temps de jouer votre rôle.\n[VOUS ÊTES CUPIDON. VOUS GAGNEZ SI LES VILLAGEOIS GAGNENT]"
+        ],
+        "wakes_up": [
+            "Cupidon, armé de son arc et de ses flèches, part dans le village, afin de trouver deux personnes qu'il liera à la vie, mais surtout à la mort."
+        ],
+        "turn": [
+            "Choisissez deux personnes à faire tomber amoureux avec !love <j1> <j2>"
+        ],
+        "in_love": [
+            "Vous ne pouvez plus vous en empêcher. Malgré tous les dangers qui rôdent dehors, vous vous glissez par la porte, et marchez silencieusement vers une maison à l'autre bout du village.\n[VOUS ÊTES AMOUREU(X/SE) DE <lover>. VOTRE NOUVEAU BUT EST QUE VOUS SOYEZ LES SEULS SURVIVANTS]"
+        ],
+        "target1_is_target2": [
+            "Vous vous plongez dans vos souvenirs. Vous vous rappellez la fois où, en faisant tomber quelqu'un amoureux de lui-même, il s'était noyé dans une mare en voulant admirer son reflet... Il vaut peut-être mieux ne pas réiterer l'expérience."
+        ],
+        "try_to_involve_himself": [
+            "C'est quand même une flèche qui se plante dans votre coeur, et ça ne doit pas être très agréable. Vous décidez de ne pas essayer sur vous."
+        ],
+        "done": [
+            "Satisfait de vous, vous vous rendormez paisiblement. Vous avez changé leur destin, mais c'est votre boulot, après tout."
+        ],
+        "go_to_sleep": [
+            "Cupidon, après avoir choisi qui aimerait qui, retourne chez lui, dans l'anonymat, reprenant sa place de personne tout ce qu'il y a de plus normale au sein du village."
+        ]
+    },
+
+    "villager": {
+        "tell_role": [
+            "Vous êtes bien dans ce village. La plupart de ses habitants sont sympatiques, et le paysage est beau et reposant. Mais fini d'observer passivement les disparitions et autres évenements étranges. Vous devez faire quelque chose.\n[VOUS ÊTES UN VILLAGEOIS. VOUS GAGNEZ SI TOUS LES LOUPS-GAROUS MEURENT]"
+        ]
+    },
+
+    "hunter": {
+        "tell_role": [
+            "Clic, clac. Le bruit du chargeur de votre pétoire vous rassure. Avec ça, personne ne vous embêtera. Et si Ils viennent quand même, gare à eux.\n[VOUS ÊTES LE CHASSEUR. VOUS GAGNEZ SI LES VILLAGEOIS GAGNENT, ET POUVEZ TUER QUELQU'UN À VOTRE MORT]"
+        ]
+    },
+
+    "seeker": {
+        "tell_role": [
+            "A travers les volutes brumeuses de votre boule de cristal, vous peinez à voir l'avenir. Il semble ne pas être clairement défini. C'est parce qu'il s'écrit ici et maintenant.\n[VOUS ÊTES LA VOYANTE. VOUS GAGNEZ SI TOUS LES LOUPS-GAROUS MEURENT]"
+        ],
+        "wakes_up": [
+            "La voyante nourrit des soupçons. De gros souçons. Elle se reveille, et, d'un pas lent et ensommeillé, se dirige vers sa boule de cristal pour obtenir des réponses."
+        ],
+        "turn": [
+            "Choisissez de qui vous voulez voir le rôle avec !see <joueur>"
+        ],
+        "try_to_see_herself": [
+            "Vous savez très bien que vous êtes une voyante, et le temps presse trop pour vous admirer au travers de votre boule de cristal."
+        ],
+        "see_role": [
+            "Les volutes de fumée s'enroulent jusqu'à former une image distincte de ce qu'est en train de faire <target>.\n[CE JOUEUR EST <role>]"
+        ],
+        "done": [
+            "Vous espèrez que ces informations seront utiles au village une fois le joueur levé. Si ce n'est pas le cas, vous avez fait de votre mieux."
+        ],
+        "go_to_sleep": [
+            "La voyante, après avoir consulté sa boule de cristal, repart se coucher, en priant intérieurement pour que ce qu'elle a découvert ne fasse pas d'elle une cible."
+        ]
+    }
+}
