@@ -26,6 +26,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(msg):
+    await msg.channel.send('_'+msg.content+'_')
     if type(msg.channel) is discord.DMChannel:
         await bot.react(msg)
     else:
