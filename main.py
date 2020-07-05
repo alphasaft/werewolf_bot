@@ -3,9 +3,10 @@
 from bot.game_master import GameMaster
 from discord.utils import get
 import discord
+import commands
+import assets
 import assets.messages as msgs
 import assets.constants as consts
-import commands
 
 DESCRIPTION = '''I'm the game master of this Werewolf server ; type !help and I will explain you.'''
 
@@ -47,4 +48,4 @@ async def on_disconnect():
 
 
 # Launch the bot
-bot.run(consts.TOKEN)
+bot.run(assets.token.TOKEN)
