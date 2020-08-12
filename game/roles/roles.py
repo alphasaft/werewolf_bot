@@ -14,11 +14,11 @@ class RolesList:
         self.game_name = game_name
         self.dialogs = dialogs
         if players:
-            self.build(players)
+            self.build(players, admin)
 
     def build(self, players: list, admin):
+        shuffle(players)
         self.admin = admin
-        print(players)
         self.roles = self._set_roles(players)
         self._alive_players = self.roles.copy()
 
@@ -91,11 +91,9 @@ class RolesList:
                 return name
 
     def change_nickname(self, old: str, new: str):
-        for name in self.roles:
-            if name == old:
-                self.roles[new] = self.roles.pop(old)
-                if name in self._alive_players:
-                    self._alive_players[new] = self._alive_players.pop(old)
+        self.roles[new] = self.roles.pop(old)
+        if old in self._alive_players:
+            self._alive_players[new] = self._alive_players.pop(old)
 
     @property
     def everyone(self):
@@ -157,20 +155,16 @@ class RolesList:
             await role.tell_role()
 
     async def kill_injured_players(self):
-        killed = []
-        for name, player in self._alive_players.items():
+        for name, player in self._alive_players.copy().items():
             if player.injured:
-                killed.append(name)
-
-        for name in killed:
-            await self._alive_players[name].kill(roles=self, dialogs=self.dialogs)
-            self._alive_players.pop(name)
+                await self._alive_players[name].kill(roles=self, dialogs=self.dialogs)
+                self._alive_players.pop(name)
 
     def quit_game(self, player_name):
         self.roles.pop(player_name)
         if self._alive_players.get(player_name):
             self._alive_players.pop(player_name)
 
-    def change_admin(self, player_name):
+    def set_admin(self, player_name):
         role = self.get_role_by_name(player_name)
         self.admin = role.user
