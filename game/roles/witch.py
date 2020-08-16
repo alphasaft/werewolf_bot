@@ -1,9 +1,10 @@
-from game.roles.villager import Villager
+from .villager import Villager
+from assets.constants import WITCH
 
 
 class Witch(Villager):
     def __init__(self, user, dialogs):
-        Villager.__init__(self, user, dialogs, 'sorcière')
+        Villager.__init__(self, user, dialogs, WITCH)
         self.resurrect_potion = 1
         self.death_potion = 1
 

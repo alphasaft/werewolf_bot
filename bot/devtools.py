@@ -177,6 +177,11 @@ class _MockedUser(discord.User):
 
         if content:
             content = "<To %s> %s" % (self.name, content)
+        elif embed:
+            title = embed.title
+            embed.title = "<To %s> %s" % (self.name, title)
+        else:
+            raise ValueError("One of CONTENT or EMBED should be provided")
 
         request = dict(
             content=content,
@@ -190,6 +195,8 @@ class _MockedUser(discord.User):
 
         ret = await self.parent.send(**request)
         self._push_history(ret)
+        if embed:
+            embed.title = title
         return ret
 
     def avatar_url_as(self, *, format=None, static_format='webp', size=1024):
@@ -403,8 +410,8 @@ def __implement_dev_commands__(bot):
     These commands are auto-implemented in the ExtendedBot class.
     """
 
-    @bot.command()
-    @has_permissions(manage_guild=True)
+    @bot.command(help="[dev] Active le mode developpeur.")
+    @has_permissions(administrator=True)
     async def devmode(ctx):
         bot.devmode = not bot.devmode
         await ctx.channel.send("Devmode set to %s" % str(bot.devmode).lower())
@@ -413,8 +420,8 @@ def __implement_dev_commands__(bot):
         else:
             bot.devtool.reset()
 
-    @bot.command()
-    @has_permissions(manage_guild=True)
+    @bot.command(help="[dev] Execute la commande qui suit pour tous les utilisateurs simulés")
+    @has_permissions(administrator=True)
     async def forall(ctx, *cmd):
         if not bot.devmode:
             await ctx.channel.send("Error : The devmode isn't on.")
@@ -430,8 +437,8 @@ def __implement_dev_commands__(bot):
             await bot.process_commands(ctx.message)
         bot.devtool.log(old_logged.name)
 
-    @bot.command(name='as')
-    @has_permissions(manage_guild=True)
+    @bot.command(name='as', help="[dev] Execute une commande en tant qu'utilisateur simulé")
+    @has_permissions(administrator=True)
     async def _as(ctx, user, *cmd):
         if not bot.devmode:
             await ctx.channel.send("Error : The devmode isn't on.")

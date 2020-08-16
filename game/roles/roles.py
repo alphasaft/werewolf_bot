@@ -1,64 +1,76 @@
-import discord
+# -*- coding=utf-8 -*-
+
 from random import shuffle
-import game.roles as roles
-from game.roles.rolegroup import RoleGroup
+
+from .were_wolf import WereWolf
+from .witch import Witch
+from .villager import Villager
+from .seeker import Seeker
+from .hunter import Hunter
+from .lovemaker import LoveMaker
+
+from .rolegroup import RoleGroup
 from assets.exceptions import NotAnAdminError
 import assets.messages as msgs
 
 
-class RolesList:
+class Roles(dict):
     def __init__(self, dialogs, game_name, players: list = None, admin=None):
-        self.roles = {}
-        self._alive_players = {}
-        self.admin = None
+        dict.__init__(self)
+        self.clear()  # Else this could store old players in case we restart a game
+
         self.game_name = game_name
         self.dialogs = dialogs
+
+        self.admin = admin
         if players:
             self.build(players, admin)
 
     def build(self, players: list, admin):
         shuffle(players)
         self.admin = admin
-        self.roles = self._set_roles(players)
-        self._alive_players = self.roles.copy()
+        self._set_roles(players)
 
     def _set_roles(self, players: list):
-        max_were_wolfs = (len(players) // 4)
-        roles_dict = {}
+        max_were_wolfs = (len(players) // 5) + 1
 
-        def set_role(_roles, _player, role, dialogs):
-            if _roles.get(_player.name):
-                _roles[_player.__str__()] = role(_player, dialogs)  # discord.User.__str__ returns name#discriminator
+        def set_role(_player, role, dialogs):
+            if self.get(_player.name):
+                self[_player.__str__()] = role(_player, dialogs)  # discord.User.__str__ returns name#discriminator
             else:
-                _roles[_player.name] = role(_player, dialogs)
+                self[_player.name] = role(_player, dialogs)
 
         for i, player in enumerate(players):
-            if i <= max_were_wolfs:
-                set_role(roles_dict, player, roles.were_wolf.WereWolf, self.dialogs)
+            if i < max_were_wolfs:
+                set_role(player, WereWolf, self.dialogs)
+            elif i == max_were_wolfs:
+                set_role(player, Seeker, self.dialogs)
             elif i == max_were_wolfs + 1:
-                set_role(roles_dict, player, roles.seeker.Seeker, self.dialogs)
+                set_role(player, Witch, self.dialogs)
             elif i == max_were_wolfs + 2:
-                set_role(roles_dict, player, roles.witch.Witch, self.dialogs)
+                set_role(player, LoveMaker, self.dialogs)
             elif i == max_were_wolfs + 3:
-                set_role(roles_dict, player, roles.lovemaker.LoveMaker, self.dialogs)
-            elif i == max_were_wolfs + 4:
-                set_role(roles_dict, player, roles.hunter.Hunter, self.dialogs)
+                set_role(player, Hunter, self.dialogs)
             else:
-                set_role(roles_dict, player, roles.villager.Villager, self.dialogs)
+                set_role(player, Villager, self.dialogs)
 
-        return roles_dict
+    def nicknames(self):
+        return list(self.keys())
+
+    def players(self):
+        return list(self.values())
 
     def check_has_player(self, name: str, injured=False):
         """
-        If not WOUNDED, checks if the player designed by PLAYER_MENTION belongs this game and is not wounded, and alive.
-        If WOUNDED, checks if this players belongs this game and is wounded, but alive.
+        If not INJURED, checks if the player designed by PLAYER_MENTION belongs this game and is not wounded, and alive.
+        If INJURED, checks if this players belongs this game and is wounded, but alive.
         If some of this two checks fails, raises a NameError.
         """
-        
+
         player_role = self.get_role_by_name(name)
         if not player_role:
             raise NameError(msgs.NO_SUCH_PLAYER % name)
-        elif player_role and not player_role.alive:
+        elif not player_role.alive:
             raise NameError(msgs.DEAD_PLAYER % name)
 
         if injured:
@@ -72,98 +84,112 @@ class RolesList:
         if not player.user == self.admin:
             raise NotAnAdminError(msgs.MISSING_PERMISSIONS % ('admin', self.game_name))
 
+    def has_role(self, role):
+        for player in self.players():
+            if player.role == role:
+                return True
+        return False
+
     def get_role_by_name(self, name: str):
-        return self.roles.get(name)
+        return self.get(name)
 
     def get_role_by_id(self, user_id: int):
-        for role in self.roles.values():
+        for role in self.values():
             if role.user.id == user_id:
                 return role
 
     def get_name_by_id(self, user_id: int):
-        for name, role in self.roles.items():
+        for name, role in self.items():
             if role.user.id == user_id:
                 return name
 
     def get_name_by_role(self, user_role):
-        for name, role in self.roles.items():
+        for name, role in self.items():
             if role == user_role:
                 return name
 
     def change_nickname(self, old: str, new: str):
-        self.roles[new] = self.roles.pop(old)
-        if old in self._alive_players:
-            self._alive_players[new] = self._alive_players.pop(old)
+        self[new] = self.pop(old)
 
     @property
     def everyone(self):
-        return RoleGroup(self.roles.values())
+        """Returns a RoleGroup object containing all players of this game."""
+        return RoleGroup(self.values())
 
     @property
     def alive_players(self):
-        return RoleGroup(self._alive_players.values())
+        """Returns a RoleGroup object containing all alive and not injured players of this game."""
+        return RoleGroup(p for p in self.values() if p.alive)
+
+    @property
+    def dead_players(self):
+        """Returns a RoleGroup object containing all dead players of this game."""
+        return RoleGroup(p for p in self.values() if not p.alive)
 
     @property
     def injured_players(self):
-        return RoleGroup([r for r in self.alive_players if r.injured])
+        """Returns a RoleGroup object containing all injured but alive players of this game."""
+        return RoleGroup(p for p in self.values() if p.injured and p.alive)
 
     @property
     def villagers(self):
-        return RoleGroup([w for w in self.alive_players if not isinstance(w, roles.were_wolf.WereWolf)])
+        """Returns a RoleGroup object containing all non-Werewolfs of this game."""
+        return RoleGroup(w for w in self.players() if not isinstance(w, WereWolf))
 
     @property
     def were_wolfs(self):
-        return RoleGroup([w for w in self.alive_players if isinstance(w, roles.were_wolf.WereWolf)])
+        """Returns a RoleGroup object containing all Werewolfs of this game."""
+        return RoleGroup(w for w in self.players() if isinstance(w, WereWolf))
 
     @property
     def hunter(self):
-        for r in self.alive_players:
-            if isinstance(r, roles.hunter.Hunter):
+        """Returns the Hunter of this game."""
+        for r in self.players():
+            if isinstance(r, Hunter):
                 return r
 
     @property
     def love_maker(self):
-        for r in self.alive_players:
-            if isinstance(r, roles.lovemaker.LoveMaker):
+        """Returns the LoveMaker of this game"""
+        for r in self.players():
+            if isinstance(r, LoveMaker):
                 return r
 
     @property
     def seeker(self):
-        for r in self.alive_players:
-            if isinstance(r, roles.seeker.Seeker):
+        """Returns the Seeker of this game"""
+        for r in self.players():
+            if isinstance(r, Seeker):
                 return r
 
     @property
     def witch(self):
-        for r in self.alive_players:
-            if isinstance(r, roles.witch.Witch):
+        """Returns the Witch of this game"""
+        for r in self.players():
+            if isinstance(r, Witch):
                 return r
 
     def wound(self, name):
-        self._alive_players[name].injured = True
+        self[name].injured = True
 
     def heal(self, name):
-        self._alive_players[name].injured = False
+        self[name].injured = False
 
     async def kill(self, name, from_lover=False):
-        self._alive_players[name].injured = True
-        await self._alive_players[name].kill(roles=self, dialogs=self.dialogs, from_lover=from_lover)
-        self._alive_players.pop(name)
+        if self[name].alive:
+            await self[name].kill(roles=self, dialogs=self.dialogs, from_lover=from_lover)
 
     async def tell_roles(self):
-        for role in self.roles.values():
+        for role in self.values():
             await role.tell_role()
 
     async def kill_injured_players(self):
-        for name, player in self._alive_players.copy().items():
+        for player in self.alive_players.copy():
             if player.injured:
-                await self._alive_players[name].kill(roles=self, dialogs=self.dialogs)
-                self._alive_players.pop(name)
+                await player.kill(roles=self, dialogs=self.dialogs)
 
     def quit_game(self, player_name):
-        self.roles.pop(player_name)
-        if self._alive_players.get(player_name):
-            self._alive_players.pop(player_name)
+        self.pop(player_name)
 
     def set_admin(self, player_name):
         role = self.get_role_by_name(player_name)

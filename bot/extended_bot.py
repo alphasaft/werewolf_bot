@@ -1,115 +1,114 @@
 from discord.ext.commands import Bot
 from assets.exceptions import MissingParameterError
-from assets.utils import on_channel
+from assets.constants import PREFIX
+from .devtools import DevTool, DevCommandNotFound, TransformationError, __implement_dev_commands__
 import assets.messages as msgs
 
 
 class ExtendedBot(Bot):
     """
-    Adds some new features to the discord.ext.commands.Bot class, such as super-commands
+    Adds some new features to the discord.ext.commands.Bot class, such as a dev-tool and confirmations
     """
 
     def __init__(self, *args, **kwargs):
-        self.sub_commands = {}
-        self.waiting_for_confirmations = {}
+        self._waiting_for_confirmations = {}
+        self.devtool = DevTool()
+        self.devmode = False
 
         Bot.__init__(self, *args, **kwargs)
 
-        @self.command()
+        @self.command(help="Confirme une commande")
         async def confirm(ctx): pass
-        @self.command()
+        @self.command(help="Annule une commande")
         async def cancel(ctx): pass
 
-    def super_command(self, name, subcommands, *cmd_args, channel=None, contains=False, false_channel_warn=False,
-                      **cmd_kwargs):
+        __implement_dev_commands__(self)
+
+    async def process_commands(self, message):
         """
-        Create a super-command, that can call sub-commands.
+        Process the command(s) contained in message.
+        If the devmode is off, we just process normally the commands with Bot.process_commands().
+        Else we try to handle this command using the DevTool.
+        """
+        if not message.content.strip().startswith(PREFIX):
+            return
 
-        NAME -> str
-        SUBCOMMANDS -> list | tuple
+        if not self.devmode:
+            return await Bot.process_commands(self, message)
 
-        Usage :
+        try: return await self.devtool.process_commands(message)
+        except DevCommandNotFound: pass
 
-        bot.super_command('super', ['sub1', ...])
+        try:
+            command = self.all_commands[message.content.split()[0][1:]]
+            ctx = await self.get_context(message)
 
-        @bot.sub_command
-        def super_sub1(ctx, *args):
-            pass
+            checks = []
 
-        Actually calls super_sub1 when someone types super sub1 [args...]
+            # We apply the checks using the right context
+            for check in command.checks.copy():
+                try:
+                    check(ctx)
+                except Exception as e:
+                    await ctx.channel.send(str(e))
+
+                command.checks.remove(check)  # We remove it temporary...
+                checks.append(check)  # And we store it to restore the command's old state when the work is done
+
+            # Then we transform the context
+            ctx = self.devtool.transform_ctx(ctx)
+
+            # Finally we invoke the commands, with removed checks.
+            ret = await command.invoke(ctx)
+            command.checks = checks
+            return ret
+
+        except KeyError:
+            await message.channel.send("Erreur : la commande %s n'existe pas." % message.content.split()[0][1:])
+
+        except TransformationError as e:
+            await message.channel.send(str(e))
+
+        except Exception as e:
+            await message.channel.send(str(e))
+
+    async def confirm(self, user, command, confirm='$confirm', cancel='$cancel'):
+        """
+        Waits for a confirmation or a cancellation message from the discord User USER for the command COMMAND.
+        Raises a RuntimeError if self was already waiting for a confirmation for that user.
+
+        Returns
+
+        True -- the user confirmed
+        False -- the user canceled
+
+        Raises
+
+        RuntimeError -- Already waiting for a confirmation
         """
 
-        if channel:
-            @self.command(name=name, *cmd_args, **cmd_kwargs)
-            @on_channel(channel, contains, false_channel_warn)
-            async def game(ctx, sub=None, *args):
-                if not sub or sub not in subcommands:
-                    if len(subcommands) > 1:
-                        await ctx.channel.send("Error : %s command's first parameter should be %s"
-                                     % (name, ", ".join(subcommands[:-1]) + ' or ' + subcommands[-1]))
-                    else:
-                        await ctx.channel.send("Error : %s command's first parameter should be %s"
-                                     % (name, subcommands[0]))
+        self.check_can_confirm(user)
 
-                    return
+        self._waiting_for_confirmations[user] = command
+        confirmation = await self.wait_for('message', check=lambda m: m.content.strip() in [confirm, cancel])
+        del self._waiting_for_confirmations[user]
 
-                await self._invoke_subcommand(name + '_' + sub, ctx, *args)
-        else:
-            @self.command(name=name, *cmd_args, **cmd_kwargs)
-            async def game(ctx, sub=None, *args):
-                if not sub or sub not in subcommands:
-                    if len(subcommands) > 1:
-                        await ctx.channel.send("Error : %s command's first parameter should be %s"
-                                     % (name, ", ".join(subcommands[:-1]) + ' or ' + subcommands[-1]))
-                    else:
-                        await ctx.channel.send("Error : %s command's first parameter should be %s"
-                                     % (name, subcommands[0]))
-
-                    return
-
-                await self._invoke_subcommand(name + '_' + sub, ctx, *args)
-
-    def sub_command(self, funct):
-        """
-        Create a sub-command, that would be called by a super-command.
-
-        FUNCT -> function, no lambda
-
-        USAGE :
-
-        bot.super_command('super', ['sub1', ...])
-
-        @bot.sub_command
-        def super_sub1(ctx, *args):
-            pass
-
-        Actually calls super_sub1 when someone types super sub1 [args...]
-        """
-        self.sub_commands[funct.__name__] = funct
-        return funct
-
-    async def _invoke_subcommand(self, name, *args, **kwargs):
-        await self.sub_commands[name](*args, **kwargs)
-
-    async def confirm(self, user, command, confirm='!confirm', cancel='!cancel'):
-        self.waiting_for_confirmations[user] = command
-        confirmation = await self.wait_for('message', check=lambda m: m.content in [confirm, cancel])
-        del self.waiting_for_confirmations[user]
         return True if confirmation.content == confirm else False
 
     def check_can_confirm(self, user):
-        already_waiting = self.waiting_for_confirmations.get(user)
+        """Checks that self isn't waiting for a confirmation from USER, else raises a RuntimeError"""
+        already_waiting = self._waiting_for_confirmations.get(user)
         if already_waiting:
-            raise RuntimeError(msgs.ALREADY_WAITING %
-                               already_waiting)
+            raise RuntimeError(msgs.ALREADY_WAITING % already_waiting)
 
     @staticmethod
-    def check_parameter(parameter, err_msg):
-        """Check if parameter is not None, else raises MissingParameterError(ERR_MSG)"""
+    def check_parameter(parameter, syntax, parameter_name):
+        """Checks that parameter is not None, else raises MissingParameterError(ERR_MSG)"""
         if parameter is None:
-            raise MissingParameterError(err_msg)
+            raise MissingParameterError(msgs.MISSING_PARAMETER % (syntax, parameter_name))
 
     @staticmethod
     def check_not_too_much_parameters(too_much, expected_syntax):
+        """Checks that too_much is empty or None, else raises a ValueError."""
         if too_much:
-            raise ValueError(msgs.TOO_MUCH_PARAMETERS % (expected_syntax, "', '".join(too_much)))
+            raise ValueError(msgs.TOO_MUCH_PARAMETERS % expected_syntax, "', '".join(too_much))

@@ -1,21 +1,26 @@
 # -*- coding: utf-8 -*-
 
-from bot.game_master import GameMaster
-from discord.utils import get
+
 import discord
-import commands
-import assets
+from discord.utils import get
+import asyncio
+
+from bot import GameMaster
+from assets.utils import assure_assertions
+import assets.token as token
 import assets.messages as msgs
 import assets.constants as consts
+import commands
 
-DESCRIPTION = '''I'm the game master of this Werewolf server ; type !help and I will explain you.'''
+# Checking that assertion will work.
+assure_assertions()
 
-
-bot = GameMaster(command_prefix=consts.PREFIX, description=DESCRIPTION, case_insensitive=True)
-
+bot = GameMaster(command_prefix=consts.PREFIX, description=consts.DESCRIPTION, case_insensitive=True)
 commands.game_cmd.__implement__(bot)
 commands.clear_cmd.__implement__(bot)
 commands.kick_cmd.__implement__(bot)
+commands.embed_cmd.__implement__(bot)
+commands.tests_cmd.__implement__(bot)
 
 
 @bot.event
@@ -27,8 +32,19 @@ async def on_ready():
 
 @bot.event
 async def on_message(msg):
-    await msg.channel.send('_'+msg.content+'_')
+    if msg.author == bot.user:
+        return  # We don't want the bot to reply to itself !
+
     if type(msg.channel) is discord.DMChannel:
+        if bot.devmode:
+            try:
+                await bot.devtool.process_commands(msg)
+            except Exception:
+                pass
+            else:
+                return
+
+            msg = bot.devtool.transform_msg(msg)
         await bot.react(msg)
     else:
         await bot.process_commands(msg)
@@ -36,10 +52,11 @@ async def on_message(msg):
 
 @bot.event
 async def on_member_join(member):
-    channel = bot.get_channel(726114430093623308)
-    roles = bot.get_guild(724226339443572770).roles
+    channel = bot.get_channel(consts.WELCOME_CHANNEL)
     await channel.send(msgs.WELCOME % member.mention)
-    await member.add_roles(get(roles, name='Manant'), reason="Role de base du village")
+    if consts.BASE_ROLE:
+        roles = bot.get_guild(consts.GUILD).roles
+        await member.add_roles(discord.utils.get(roles, name=consts.BASE_ROLE), reason="Role de base du village")
 
 
 @bot.event
@@ -47,5 +64,10 @@ async def on_disconnect():
     print('Disconnected')
 
 
-# Launch the bot
-bot.run(assets.token.TOKEN)
+if __name__ == '__main__':
+    try:
+        # Launch the bot
+        bot.run(token.TOKEN)
+    finally:
+        # Recording the dialogs
+        bot.dialogs.save(consts.DIALOGS_PATH)

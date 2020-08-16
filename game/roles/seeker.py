@@ -1,14 +1,14 @@
-# Cannot speak correctly english, so maybe "seeker" is not "voyante"
-from game.roles.villager import Villager
+from .villager import Villager
+from assets.constants import SEEKER
 
 
 class Seeker(Villager):
     def __init__(self, user, dialogs):
-        Villager.__init__(self, user, dialogs, 'voyante')
+        Villager.__init__(self, user, dialogs, SEEKER)
         self.saw = {}
 
-    def see_role(self, user_mention: str, role_name: str):
-        self.saw[user_mention] = role_name
+    def see_role(self, user_mention: str, role: str):
+        self.saw[user_mention] = role
 
     def saw_as_str(self):
         """Returns something like
@@ -19,7 +19,7 @@ class Seeker(Villager):
 
         Depending of the roles the player have seen
         """
-        return "- "+",\n- ".join([user+': '+role_name for user, role_name in self.saw.items()])
+        return "- "+",\n- ".join([user+': '+role for user, role in self.saw.items()])
 
     async def tell_role(self):
         await self.user.send(self.dialogs.seeker.tell_role.tell())

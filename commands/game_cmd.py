@@ -1,7 +1,8 @@
 from discord.utils import get
 from assets import messages as msgs
 from bot.game_master import GameMaster
-from assets.utils import mention
+from assets.utils import get_id, make_mention
+from assets.constants import EXPEDITIONS_CATEGORY
 
 
 BRIEF = """Crée, supprime et gère vos parties."""
@@ -10,46 +11,49 @@ FULL = """
 Crée, supprime et gère vos parties.
 Pas d'autorisations nécessaires pour utiliser cette commande.
 
-game new <NOM> -> crée la partie NOM ; vous êtes son admin
-game join <NOM> -> Rejoint la partie NOM
+game new nomDeLaPartie -> crée une partie ; vous êtes son admin
+game join unePartie -> Rejoint cette partie
 game quit -> Quitte la partie, ou la détruit si vous êtes son admin
 game list -> Affiche la liste des parties joignables
-game members <PARTIE> -> Affiche les membres de la partie PARTIE
+game members unePartie -> Affiche les membres de cette partie
 
 Ces commandes nécessitent d'être l'admin de votre partie.
-[admin] game admin <JOUEUR> -> Change l'admin pour JOUEUR
-[admin] game kick <JOUEUR> -> Kick le joueur JOUEUR de votre partie
+[admin] game admin unJoueur -> Change l'admin de votre partie pour ce joueur
+[admin] game kick unJoueur -> Kick ce joueur de votre partie
 """
 
 
 def __implement__(bot: GameMaster):
     """Implement the command 'game' in the bot. Unable to use that command if not implemented"""
-
-    bot.super_command("game", ['new', 'join', 'admin', 'quit', 'kick', 'list', 'members', 'start'],
-                      brief=BRIEF, help=FULL, channel="taverne", contains=True, false_channel_warn=True)
+    
+    @bot.group(brief=BRIEF, help=FULL)
+    async def game(ctx):
+        if not ctx.invoked_subcommand:
+            await ctx.channel.send("Sub-commande invalide %s" % ctx.message.content.strip().split()[1])
 
     # Create a new game session
-    @bot.sub_command
-    async def game_new(ctx, game_name=None, *too):
+    @game.command()
+    async def new(ctx, game_name=None, *too):
         try:
-            bot.check_parameter(game_name, msgs.MISSING_PARAMETER % ("game new <NOM DE LA PARTIE>", "NOM DE LA PARTIE"))
+            bot.check_parameter(game_name, "game new nomDeLaPartie", "nomDeLaPartie")
             bot.check_game_doesnt_exist(game_name)
-            bot.check_is_alone(ctx.author.mention)
-            bot.check_not_too_much_parameters(too, "game new <NOM DE LA PARTIE>")
+            bot.check_is_alone(ctx.author.id)
+            bot.check_not_too_much_parameters(too, "game new nomDeLaPartie")
         except Exception as e:
             await ctx.channel.send(e)
             return
 
-        bot.add_game(game_name, ctx.author)
+        bot.add_game(game_name, ctx.author, home_channel=ctx.channel)
         await ctx.channel.send(msgs.SUCCESSFULLY_CREATED % (game_name, game_name))
 
     # Join a game session
-    @bot.sub_command
-    async def game_join(ctx, game_name=None):
+    @game.command()
+    async def join(ctx, game_name=None):
         try:
-            bot.check_parameter(game_name, msgs.MISSING_PARAMETER % ("game join <NOM DE LA PARTIE>", "NOM DE LA PARTIE"))
-            bot.check_is_alone(ctx.author.mention)
+            bot.check_parameter(game_name, "game join unePartie", "unePartie")
             bot.check_game_exists(game_name)
+            bot.check_is_alone(ctx.author.id)
+            bot.check_can_join(game_name)
         except Exception as e:
             await ctx.channel.send(e)
             return
@@ -58,55 +62,60 @@ def __implement__(bot: GameMaster):
         await ctx.channel.send(msgs.SUCCESSFULLY_JOINED % game_name)
 
     # Change the admin of a game session
-    @bot.sub_command
-    async def game_admin(ctx, new_admin=None):
-        new_admin = mention(new_admin)  # Removing this <@>>!<<[id]>
+    @game.command()
+    async def admin(ctx, new_admin=None):
+        new_admin = get_id(new_admin)
         try:
-            bot.check_parameter(new_admin, msgs.MISSING_PARAMETER % ("game admin <ADMIN>", "ADMIN"))
-            bot.check_has_joined(ctx.author.mention)
-            bot.check_has_joined(new_admin, bot.which_game(ctx.author.mention))
-            bot.check_is_admin(ctx.author.mention)
+            bot.check_parameter(new_admin, "game admin unJoueur", "unJoueur")
+            bot.check_has_joined(ctx.author.id)
+            bot.check_has_joined(new_admin, bot.which_game(ctx.author.id))
+            bot.check_is_admin(ctx.author.id)
         except Exception as e:
             await ctx.channel.send(e)
             return
 
-        game_name = bot.which_game(ctx.author.mention)
+        game_name = bot.which_game(ctx.author.id)
         bot.set_admin(game_name, new_admin)
-        await ctx.channel.send(msgs.ADMIN_SUCCESSFULLY_CHANGED % (game_name, new_admin))
+        await ctx.channel.send(msgs.ADMIN_SUCCESSFULLY_CHANGED % (game_name, make_mention(new_admin)))
 
     # Quit the game
-    @bot.sub_command
-    async def game_quit(ctx):
+    @game.command(name='quit')
+    async def _quit(ctx):
         try:
-            bot.check_has_joined(ctx.author.mention)
+            bot.check_has_joined(ctx.author.id)
             bot.check_can_confirm(ctx.author)
+            assert not bot.is_active(bot.which_game(ctx.author.id)), msgs.CANNOT_QUIT_IN_GAME
         except Exception as e:
             await ctx.channel.send(e)
             return
 
-        game_name = bot.which_game(ctx.author.mention)
+        game_name = bot.which_game(ctx.author.id)
+
         if bot.get_admin(game_name) == ctx.author:
             await ctx.channel.send(msgs.CONFIRM_FOR_GAME_DESTRUCTION % game_name)
             confirm = await bot.confirm(ctx.author, "game quit (admin)")
 
-            if confirm:
+            if confirm is None:
+                return
+
+            elif confirm:
                 bot.delete_game(game_name)
                 await ctx.channel.send(msgs.SUCCESSFULLY_DELETED % game_name)
 
         else:
-            bot.quit_game(ctx.author.mention)
+            bot.quit_game(ctx.author.id)
             await ctx.channel.send(msgs.SUCCESSFULLY_QUITED % game_name)
 
     # Kick a player from your game
-    @bot.sub_command
-    async def game_kick(ctx, player: str = None):
-        player = mention(player)
+    @game.command()
+    async def kick(ctx, player: str = None):
+        player = get_id(player)
         try:
-            bot.check_parameter(player, msgs.MISSING_PARAMETER % ("!game kick <JOUEUR>", "JOUEUR"))
-            bot.check_has_joined(ctx.author.mention)
-            bot.check_has_joined(player, bot.which_game(ctx.author.mention))
-            bot.check_is_admin(ctx.author.mention)
-            if player == ctx.author.mention:
+            bot.check_parameter(player, "!game kick unJoueur", "unJoueur")
+            bot.check_has_joined(ctx.author.id)
+            bot.check_has_joined(player, bot.which_game(ctx.author.id))
+            bot.check_is_admin(ctx.author.id)
+            if player == ctx.author.id:
                 raise NameError(msgs.CANNOT_KICK_YOURSELF)
         except Exception as e:
             await ctx.channel.send(e)
@@ -114,47 +123,58 @@ def __implement__(bot: GameMaster):
 
         game = bot.which_game(player)
         bot.quit_game(player)
-        await ctx.channel.send(msgs.SUCCESSFULLY_KICKED % (player, game))
+        await ctx.channel.send(msgs.SUCCESSFULLY_KICKED % (make_mention(player), game))
 
     # Get the list of the available games
-    @bot.sub_command
-    async def game_list(ctx):
+    @game.command(name='list')
+    async def _list(ctx):
         games = bot.get_opened_games()
         if games:
-            await ctx.channel.send(msgs.OPENED_GAMES_LIST % "\n- ".join(games))
+            await ctx.channel.send(embed=msgs.OPENED_GAMES_LIST.build(games="\n- ".join(games)))
         else:
-            await ctx.channel.send(msgs.NO_OPENED_GAME)
+            await ctx.channel.send(embed=msgs.NO_OPENED_GAME.build())
 
     # Get the members of a game
-    @bot.sub_command
-    async def game_members(ctx, game_name=None, *too):
+    @game.command(name='members')
+    async def _members(ctx, game_name=None, *too):
         try:
-            bot.check_parameter(game_name, msgs.MISSING_PARAMETER % ("!game members <NOM DE LA PARTIE>", "NOM DE LA PARTIE"))
-            bot.check_not_too_much_parameters(too, "!game members <NOM DE LA PARTIE>")
+            bot.check_parameter(game_name, "!game members unePartie", "unePartie")
+            bot.check_not_too_much_parameters(too, "!game members unePartie")
             bot.check_game_exists(game_name)
         except Exception as e:
             await ctx.channel.send(e)
             return
 
-        members = bot.get_game_members(game_name)
-        await ctx.channel.send(msgs.GAME_MEMBERS_LIST % (game_name, "\n- ".join(members), len(members)))
+        members = [member.mention for member in bot.get_game_members(game_name)]
+        await ctx.channel.send(embed=msgs.GAME_MEMBERS_LIST.build(
+            members="\n- ".join(members),
+            name=game_name,
+            how_much=len(members)
+        ))
 
     # Start a game
-    @bot.sub_command
-    async def game_start(ctx, *too):
+    @game.command()
+    async def start(ctx, *too):
         try:
             bot.check_not_too_much_parameters(too, "!game start")
-            bot.check_has_joined(ctx.author.mention)
-            bot.check_can_launch(bot.which_game(ctx.author.mention))
+            bot.check_has_joined(ctx.author.id)
+            bot.check_is_admin(ctx.author.id)
+            bot.check_can_launch(bot.which_game(ctx.author.id))
         except Exception as e:
             await ctx.channel.send(e)
             return
 
-        game_name = bot.which_game(ctx.author.mention)
-        #category = get(ctx.guild.categories, name='votes')
-        #bot.vote_channels[game_name] = await ctx.guild.create_voice_channel(game_name, category=category, reason="Heberge les débats")
-        await bot.launch_game(game_name)
-        await ctx.channel.send(msgs.GAME_START % "\n- ".join(bot.get_game_members(game_name)))
+        async with ctx.channel.typing():
+            game_name = bot.which_game(ctx.author.id)
+            category = get(ctx.guild.categories, name=EXPEDITIONS_CATEGORY)
+            bot.voice_channels[game_name] = await ctx.guild.create_voice_channel(
+                game_name,
+                category=category,
+                reason="Heberge les débats"
+            )
+            members = [member.mention for member in bot.get_game_members(game_name)]
+            await bot.launch_game(game_name)
+            await ctx.channel.send(embed=msgs.GAME_START.build(members="\n- ".join(members)))
 
 
 

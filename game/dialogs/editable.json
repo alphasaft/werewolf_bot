@@ -1,11 +1,11 @@
 {
     "everyone": {
-        "sleep": "Message affiché lorque le village s'endort"
+        "sleep": "Message affiché lorque le village s'endort. Informations nécessaires : -"
     },
 
     "witch": {
         "tell_role": "Message annoncant le rôle de la sorcière au joueur.",
-        "wakes_up": "Message envoyé à tous les joueurs (la sorcière s'éveille).",
+        "wakes_up": "Message envoyé à tous les joueurs (la sorcière s'éveille)."
     },
 
     "werewolf": {

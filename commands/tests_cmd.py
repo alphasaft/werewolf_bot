@@ -8,7 +8,9 @@ ERASE_TEST_HELP = """Supprime les traces du dernier test"""
 
 
 def __implement__(bot):
-    """Implement the command 'purgeexpeditions' in the bot. Unable to use that command if not implemented"""
+    """
+    Implement the command 'purgeexpeditions' and 'erasetest' in the bot. Unable to use that command if not implemented
+    """
 
     @bot.command(name='purgeexpeditions', help=PURGE_EXP_HELP)
     @has_permissions(administrator=True)

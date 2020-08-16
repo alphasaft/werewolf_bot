@@ -1,6 +1,8 @@
 import asyncio
+from traceback import extract_stack
+
 from game.session import Session
-from game.dialogs.story_book import StoryBook
+from game.dialogs import StoryBook
 from random import randint
 import assets.constants as consts
 
@@ -18,6 +20,9 @@ class OfflineUser:
     def __init__(self, name):
         self.name = name
         self.id = randint(0, 1000000)
+
+    def __str__(self):
+        return self.mention
 
     @property
     def mention(self):
@@ -45,7 +50,7 @@ class OfflineBotDmChannels:
 
     async def start(self):
         """
-        Start the channel. Blocks the program. Waits for messages, and, if self.bot is not None, calls
+        Start the channel and blocks the program. Waits for messages, and, if self.bot is not None, calls
         self.bot.react(OfflineMessage(msg, self.logged_user)) for each message.
         """
         print("[system] Starting simulated channel %s" % self.name)
@@ -81,7 +86,7 @@ class OfflineBotDmChannels:
             self.exit()
 
         else:
-            print("Wrong commande %s" % msg)
+            print("Wrong command %s" % msg)
 
     def change_logged_user(self, new_logged):
         new_logged = new_logged if new_logged[0] == "@" else "@"+new_logged
@@ -111,25 +116,26 @@ def async_error_pusher(f):
     async def wrapper(*args, **kwargs):
         try:
             await f(*args, **kwargs)
-        except Exception as e:
-            print('In %s : %s : %s' % (f.__name__, e.__class__.__name__, e))
+        except:
+            raise
     return wrapper
 
 
 if __name__ == "__main__":
     async def main():
         players = [OfflineUser("Alphasaft"), OfflineUser("Blueberry"), OfflineUser("Ecta"), OfflineUser("Lucifer"), OfflineUser("Dridri"), OfflineUser("Wera"), OfflineUser('Hello')]
-        session = Session("offline", StoryBook(consts.DIALOGS_PATH))
+        session = Session("offline", players[0], StoryBook(consts.DIALOGS_PATH))
         bot = GameBot(session)
         game_dm_channels = OfflineBotDmChannels("test", players, bot=bot)
 
-        launch_future = async_error_pusher(session.start)
-        channel_start_future = async_error_pusher(game_dm_channels.start)
-        await asyncio.gather(
-            asyncio.ensure_future(launch_future(players, players[0])),
-            asyncio.ensure_future(channel_start_future())
-        )
+        session.force_build(players)
 
+        # launch_future = async_error_pusher(session.launch)
+        # channel_start_future = async_error_pusher(game_dm_channels.start)
+        await asyncio.gather(
+            asyncio.ensure_future(session.launch()),
+            asyncio.ensure_future(game_dm_channels.start())
+        )
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())

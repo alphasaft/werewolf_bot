@@ -1,38 +1,43 @@
-from assets.utils import mention
-
-
-class RoleGroup(list):
+class RoleGroup(set):
     def __init__(self, roles):
-        list.__init__(self, roles)
+        set.__init__(self, roles)
 
     def __eq__(self, other):
-        if not isinstance(other, (list, RoleGroup)):
-            raise TypeError("Invalid type %s for RoleGroup.__eq__(self, other)" % other.__class__.__name__)
+        if not isinstance(other, (set, RoleGroup)):
+            try:
+                other = set(other)
+            except Exception as e:
+                raise TypeError("Invalid type %s for RoleGroup.__eq__(self, other)" % other.__class__.__name__) from e
 
-        for item in other:
-            if item not in self:
-                return False
-        for item in self:
-            if item not in other:
-                return False
+        return set.__eq__(self, other)
 
-        return True
-
-    def exclude(self, player_id: str):
-        for i, role in enumerate(self):
-            if role.user.id == player_id:
-                self.pop(i)
+    def exclude(self, *player_ids):
+        for _id in player_ids:
+            self.remove(self.get_player(_id))
         return self
 
-    def contains_player(self, player_mention):
-        return player_mention in self.players()
+    def contains_player(self, player_id):
+        try:
+            self.get_player(player_id)
+            return True
+        except KeyError:
+            return False
 
     def players(self):
         return [role.user for role in self]
 
-    async def send(self, msg):
-        for role in self:
-            await role.user.send(msg)
+    def only_alive(self):
+        for player in self.copy():
+            if not player.alive:
+                self.exclude(player.id)
+        return self
 
-    def __getitem__(self, item):
-        return RoleGroup(list.__getitem__(self, item))
+    async def send(self, content=None, **kwargs):
+        for role in self:
+            await role.user.send(content=content, **kwargs)
+
+    def get_player(self, player_id):
+        for role in self.copy():
+            if role.user.id == player_id:
+                return role
+        raise KeyError("Cannot find a player with id %i" % player_id)

@@ -1,39 +1,42 @@
 import json
 from random import choice
+from assets.utils import block
 
 
 class StoryBook(dict):
     """
-    Store all the dialogs, based on a json file. Allows you to do storybook.a_dialog instead of storybook['a_dialog']
+    Store all the dialogs, based on a json file.
+    The book is out of several chapters (see _StoryChapter). Use myBook.aChapter to access it.
     """
     def __init__(self, file):
         dict.__init__(self)
         self._get_dialogs(file)
 
     def __getattr__(self, item):
-        """Return dict.__getitem__(self, item)"""
-        return self.__getitem__(item)
+        """Return self[item]"""
+        return self[item]
 
     def __str__(self):
         return str(self.as_json())
 
     def _get_dialogs(self, file):
+        """Internal function to read the json file."""
         with open(file, 'r') as json_file:
-            all_dialogs = json.load(json_file)
+            all_dialogs = json.loads(bytes(json_file.read(), "utf-8"))
 
-        for name, chapter in all_dialogs.items():
-            self[name] = _StoryChapter()
-            for page, dialogs in chapter.items():
-                self[name].pages[page] = _StoryPage(dialogs)
+        for chapter, chapter_content in all_dialogs.items():
+            self[chapter] = _StoryChapter()
+            for page, dialogs in chapter_content.items():
+                self[chapter][page] = _StoryPage(dialogs)
 
     def as_json(self):
-        """Return a dict, usefull for json.dump"""
+        """Return a dict, useful for json.dump"""
         json_dict = {}
         for name, chapter in self.items():
-            if not json_dict.get(chapter):
-                json_dict[chapter] = {}
-            for page_name, page in chapter.pages.items():
-                json_dict[chapter][page_name] = page.to_list()
+            if not json_dict.get(name):
+                json_dict[name] = {}
+            for page_name, page in chapter.items():
+                json_dict[name][page_name] = page.to_list()
 
         return json_dict
 
@@ -46,26 +49,40 @@ class StoryBook(dict):
             json.dump(self.as_json(), json_file, indent=4)
 
 
-class _StoryChapter:
+class _StoryChapter(dict):
+    """
+    Represents a chapter of a StoryBook. Each chapter refer to a villager, or a villager group (werewolf, witch...), and
+    is out of several pages (see _StoryPage).
+    You can access them with myStoryChapter.aPage
+    """
     def __init__(self, pages=None):
-        self.pages = pages or {}
+        if pages:
+            dict.__init__(self, pages)
+        else:
+            dict.__init__(self)
 
     def __getattr__(self, item):
-        return self.pages[item]
+        """Returns self[item]"""
+        return self[item]
 
 
-class _StoryPage:
+class _StoryPage(list):
     def __init__(self, dialogs):
-        self.dialogs = dialogs
+        list.__init__(self, dialogs)
 
     def to_list(self):
-        return self.dialogs
+        """Returns list(self)"""
+        return list(self)
 
-    def tell(self, **infos):
-        dialog = choice(self.dialogs)
-        for name, info in infos.items():
-            if "<"+name+">" not in dialog:
-                raise ValueError("Cannot find info '<%s>' in dialog '%s'" % (info, dialog))
-            dialog = dialog.replace('<'+name+'>', info)
-        return dialog
+    def tell(self, **info):
+        """
+        Select a random dialog in self using random.choice(self), and format it with **infos, e.g. if the selected
+        dialog is "Hello {player} !", tell(player="Someone") returns "Hello Someone !".
+        Then formats the dialog as a discord block and returns it.
+        """
+        dialog = choice(self)
+        dialog = dialog.format(**info)
+        return block(dialog)
 
+    def write(self, *dialogs):
+        self.extend(dialogs)

@@ -6,5 +6,6 @@ class DuskStep(BaseStep):
         BaseStep.__init__(self, None)
 
     async def start(self, roles, dialogs):
+        self.__init__()
         await roles.everyone.send(dialogs.everyone.sleep.tell())
         await BaseStep.end(self, roles, dialogs)

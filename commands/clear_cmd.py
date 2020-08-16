@@ -1,14 +1,11 @@
-from assets import messages as msgs
 from discord.ext.commands import has_permissions
-from discord.utils import get
 
 
 BRIEF = """Supprime les n derniers messages."""
 
 FULL = """
-Supprime les n derniers messages.
+Supprime les n derniers messages, ou tous si n n'est pas donné, ou s'il est égal à "full"
 Seul les administrateurs du serveur peuvent utiliser cette commande
-Utiliser !clear full revient à supprimer tous les messages du channel sauf ceux de bienvenue.
 """
 
 
@@ -18,8 +15,7 @@ def __implement__(bot):
     @bot.command(name='clear', brief=BRIEF, help=FULL, category="administrator")
     @has_permissions(manage_messages=True)
     async def clear(ctx, n=None):
-        history_length = len(await ctx.channel.history().flatten())
         if n == 'full' or n is None:
-            n = history_length
+            n = len(await ctx.channel.history(limit=None).flatten())
 
         await ctx.channel.purge(limit=int(n)+1)
