@@ -29,6 +29,15 @@ async def on_ready():
     print('Id :', bot.user.id)
     print('------')
 
+@bot.event
+async def on_connect():
+    print("(Re)connected")
+
+
+@bot.event
+async def on_disconnect():
+    print('Disconnected')
+
 
 @bot.event
 async def on_message(msg):
@@ -57,11 +66,6 @@ async def on_member_join(member):
     if consts.BASE_ROLE:
         roles = bot.get_guild(consts.GUILD).roles
         await member.add_roles(discord.utils.get(roles, name=consts.BASE_ROLE), reason="Role de base du village")
-
-
-@bot.event
-async def on_disconnect():
-    print('Disconnected')
 
 
 if __name__ == '__main__':

@@ -182,9 +182,9 @@ GAME_MEMBERS_LIST = _EmbedSkeleton(
 
 # --- game start ---
 
-MISSING_PLAYERS = f"""
-:x: Il manque encore des joueurs pour pouvoir démarrer la partie %s ! (%i/{consts.MINIMUM_PLAYERS}) 
-"""
+MISSING_PLAYERS = """
+:x: Il manque encore des joueurs pour pouvoir démarrer la partie %s ! (%i/{})
+""".format(consts.MINIMUM_PLAYERS)
 
 GAME_START = _EmbedSkeleton(
     title="Nouvelle expédition !",

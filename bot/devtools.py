@@ -52,7 +52,7 @@ class _AsyncIterator:
         return result
 
     def flatten(self):
-        return self._iterable
+        return list(self._iterable)
 
 
 # core
