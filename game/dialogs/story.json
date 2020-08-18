@@ -1,87 +1,7 @@
 {
-    "everyone": {
-        "game_begins": [
-            "Une nouvelle aventure commence ! Y-survivrez vous ?"
-        ],
-        "game_ended": [
-            "C'est la fin de cette partie ! En esp\u00e8rant que vous avez aim\u00e9 ! Vous pouvez discuter un peu, puis partir avec $quit, ou redémarrer une partie avec $again. La partie sera d\u00e9truite lorque tout le monde l'aura quitt\u00e9e."
-        ],
-        "first_sleep": [
-            "La journ\u00e9e a \u00e9t\u00e9 tr\u00e8s \u00e9puisante, et vous n'avez qu'une envie, dormir. Mais vous savez au fond de vous que cette nuit ne sera pas reposante... Vous mettez ces pressentiments de cot\u00e9 et vous vous couchez bien au chaud, sous votre couette."
-        ],
-        "sleep": [
-            "Apr\u00e8s cette journ\u00e9e \u00e9puisante et lourde en sacrifices, vous d\u00e9cidez de vous endormir..."
-        ],
-        "villagers_dead_summary": [
-            "Cette nuit, votre village a \u00e9t\u00e9 le t\u00e9moin de meutres, et d'une barbarerie sans nom. Vous vous risquez hors de la maison et jetez une oeil dehors."
-        ],
-        "werewolfs_dead_summary": [
-            "La chasse de cette nuit \u00e9tait plut\u00f4t amusante, mais vous vous inqui\u00e8tez de la r\u00e9action des autres villageois. Vous sortez de votre maison, et risquez un oeil dehors."
-        ],
-        "werewolf_death_seen_by_villager": [
-            "{player} est mort(e) cette nuit. \u00c0 sa carrure forte et muscl\u00e9e, vous voyez qu'il s'agissait d'un loup-garou. Vous poussez un soupir de soulagement ; c'aurait pu \u00eatre l'un des votres..."
-        ],
-        "villager_death_seen_by_villager": [
-            "{player} est mort(e). Ses v\u00eatements sont en lambeaux, et son corps est lac\u00e9r\u00e9 de toutes parts par d'\u00e9normes traces de griffe. Vous savez que ce n'\u00e9tait pas un loup-garou, et pleurez sa perte ; il ou elle \u00e9tait {role}."
-        ],
-        "you_are_dead": [
-            "[VOUS \u00caTES MORT. VOUS POUVEZ CONTINUEZ DE REGARDER LA PARTIE, OU LA QUITTER AVEC $quit]"
-        ],
-        "werewolf_death_seen_by_werewolf": [
-            "Vous retrouvez le corps de {player}. Les villageois sont heureux qu'il ne soit plus, et vous feignez de faire de m\u00eame, mais en r\u00e9alit\u00e9, vous jurez de leur faire payer cela \u00e0 la nuit tomb\u00e9e."
-        ],
-        "villager_death_seen_by_werewolf": [
-            "{player} est \u00e9tendu(e) au travers de la chauss\u00e9e. Tant mieux. Il \u00e9tait {role}, et \u00e7a en fera un de moins pour vous mettre des b\u00e2tons dans les roues."
-        ],
-        "killed_by_night": [
-            "Lorsque vous vous r\u00e9veillez, vous vous sentez en proie \u00e0 une douleur atroce et, avant que vous n'ayez pu prononcer la moindre parole, vous n'\u00e9tiez d\u00e8j\u00e0 plus rien d'autre qu'un corps sans vie de plus dans ce village [VOUS \u00caTES MORT. VOUS POUVEZ CONTINUEZ DE REGARDER LA PARTIE, OU LA QUITTER AVEC $quit]."
-        ],
-        "nobody_is_dead": [
-            "A votre grande surprise, personne n'est mort cette nuit... Vous en concluez que c'est une sorte de match nul entre les deux camps."
-        ],
-        "vote_begins": [
-            "Apr\u00e8s les \u00e9venements de cette nuit, la plupart des villageois du village d\u00e9cident de voter, afin d'\u00e9liminer quelqu'un qu'ils soupconnent d'\u00eatre un loup-garou. Ceci \u00e9tant \u00e9galement pour les loup-garous l'occasion d'\u00e9liminer quelques villageois de fa\u00e7on tout ce qu'il y a de plus l\u00e9gal, ils acceptent \u00e9galement, et tout le village se r\u00e9unit. [UTILISEZ $vote <joueur> POUR VOTER, $votes POUR CONSULTER LES VOTES, OU $pass POUR VOTER BLANC.] "
-        ],
-        "invalid_vote_target": [
-            "Les r\u00e8gles sont claires : vous devez voter pour {authorized_targets}, et vous n'\u00eates pas s\u00fbr que votre vote soit pris en compte si vous faites autrement."
-        ],
-        "has_already_voted": [
-            "Vous avez d\u00e9j\u00e0 vot\u00e9, et n'\u00eates pas s\u00fbr que tricher rallierait les autres \u00e0 votre cause."
-        ],
-        "has_voted": [
-            "{player} a vot\u00e9 contre {target} !"
-        ],
-        "white_vote": [
-            "{player} n'est pas s\u00fbr. il/elle se dit que ce serait peut \u00eatre mieux de ne pas voter, et d\u00e9pose un vote blanc. "
-        ],
-        "canceled_vote_by_white_votes": [
-            "Tout le monde ayant vot\u00e9 blanc, le vote est annul\u00e9. Personne ne sera tu\u00e9 aujourd'hui."
-        ],
-        "canceled_vote_by_equality": [
-            "{players} ayant \u00e0 plusieurs reprises re\u00e7u autant de votes, le vote est annul\u00e9, afin de ne pas \u00e0 avoir \u00e0 tirer au sort la vie d'une personne, peut-\u00eatre innocente."
-        ],
-        "equality": [
-            "{players} sont \u00e0 \u00e9galit\u00e9. Le village d\u00e9cide donc d'organiser un {turn}\u00e8me tour de vote, o\u00f9 vous ne pouvez voter que pour eux"
-        ],
-        "killed_by_vote": [
-            "Malgr\u00e9 tout vos arguments pour les convaincre de ne pas vous tuer, vous \u00e9chouez. Vous \u00eates \u00e9xecut\u00e9(e) publiquement, sur la place du village, et votre identit\u00e9 est r\u00e9v\u00e9l\u00e9e au grand jour."
-        ],
-        "player_was_killed_by_vote": [
-            "{player} se d\u00e9bat, argumente, crie puis enfin se r\u00e9soud \u00e0 \u00eatre tu\u00e9(e). Vous l'emmenez au milieu de la place pour en finir : il/elle \u00e9tait {role}"
-        ],
-        "villagers_won": [
-            "C'\u00e9tait le dernier. Apr\u00e8s de longues nuits blanches, vous avez enfin r\u00e9ussi \u00e0 \u00e9liminer tous les loups-garous !\nLES VILLAGEOIS ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n\n"
-        ],
-        "werewolfs_won": [
-            "Ce village ne se rel\u00e8vera pas. Les loups-garou ont massacr\u00e9 tous les habitants, un par un. Mais ils ressentent de la fiert\u00e9, la fiert\u00e9 d'\u00eatre les seuls responsables de ce carnage. Ils le regardent une derni\u00e8re fois, puis s'enfoncent dans la for\u00eat, \u00e0 la recherche de nouvelles proies.\nLES LOUPS-GAROUS ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n"
-        ],
-        "lovers_won": [
-            "{lover1} et {lover2} sont seuls au monde. Ils se regardent, se prennent par la main, et quittent silencieusement ce lieu de mort et de d\u00e9solation, heureux d'\u00eatre \u00e0 deux et en vie.\nLES AMOUREUX ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n"
-        ]
-    },
     "witch": {
-        "tell_role": [
-            "Vous surveillez d'un oeil fatigu\u00e9 vos potions. L'une rouge, l'autre bleue. La vie et la mort. Vous sentez que ce soir, plus que jamais, vous en aurez besoin...\n[VOUS \u00caTES UNE SORCI\u00c8RE. ELIMINEZ LES LOUP-GAROUS POUR GAGNER]"
+        "do_nothing": [
+            "Vous sentez que ce n'est pas maintenant que vous devez agir. Vous vous retournez vers votre distilleur de potions, et regardez le liquide glisser doucement d'un r\u00e9cipient \u00e0 l'autre."
         ],
         "wakes_up": [
             "La sorci\u00e8re ne dort jamais. Elle doit constamement surveiller ses potions, afin que leur pr\u00e9paration soit parfaite et sans erreurs. Maintenant, il est temps pour elle de s'en servir...",
@@ -90,105 +10,156 @@
         "turn": [
             "{killed_players} a/ont \u00e9t\u00e9 tu\u00e9(s) cette nuit. Vous poss\u00e8dez {death_potion} potion de mort et {resurrect_potion} potion de vie. Vous pouvez utiliser $kill <player>, $resurrect <player> ou $pass pour ne rien faire."
         ],
-        "is_dying": [
-            "Vous projetiez d'aider quelqu'un cette nuit, mais il va falloir changer vos plans : vous \u00eates en sang, et si vous ne faitez rien, vous allez probablement mourir. Vous pouvez taper $resurrect pour vous ressuciter si vous poss\u00e8dez encore une potion de vie, ou faire une autre action : {killed_players} a/ont \u00e9t\u00e9 tu\u00e9(s) cette nuit. Vous poss\u00e8dez {death_potion} potion de mort et {resurrect_potion} potion de vie. Vous pouvez utiliser $kill <player>, $resurrect <player> ou $pass pour ne rien faire."
+        "kill": [
+            "Quelques secondes apr\u00e8s avoir bu votre potion, {target} s'\u00e9croule sur le sol. Vous esp\u00e8rez seulement ne pas vous \u00eatre tromp\u00e9e sur son compte..."
         ],
-        "go_to_sleep": [
-            "Apr\u00e8s avoir touill\u00e9, m\u00e9lang\u00e9, distill\u00e9 ses potions, la sorci\u00e8re est retourn\u00e9e se coucher. Peut \u00eatre a-t-elle fait quelque chose de si lourd \u00e0 porter qu'elle ne dormira pas cette nuit."
-        ],
-        "try_to_kill_herself": [
-            "Vous avez bien fait de vous demander ce que contenait cette tasse avant de la boire ; \u00e0 d\u00e9faut de caf\u00e9 pour vous aider \u00e0 rester \u00e9veill\u00e9, cette potion aurait pu vous endormir. Pour toujours."
-        ],
-        "try_to_resurrect_herself": [
-            "Peut \u00eatre que votre potion de vie aurait des effets positifs sur vous, mais vous n'avez jamais test\u00e9 cela sur un \u00eatre encore vivant. Vous r\u00e9sistez donc \u00e0 la tentation d'en boire."
-        ],
-        "empty_death_potion": [
-            "Vous n'oterez la vie \u00e0 personne ce soir ; votre fiole de mort est vide, et vous avez oubli\u00e9 d'en pr\u00e9parer une seconde dose."
+        "resurrect_herself": [
+            "Vous vous jetez sur votre potion de vie, ouvrez son goulot et en avalez le contenu avant qu'il soit trop tard."
         ],
         "empty_resurrect_potion": [
             "Vous \u00eates prise de sueurs froides. La fiole vide dans vos mains vous rappelle \u00e0 quel point vous \u00eates vuln\u00e9rable, sans vos potions."
         ],
-        "do_nothing": [
-            "Vous sentez que ce n'est pas maintenant que vous devez agir. Vous vous retournez vers votre distilleur de potions, et regardez le liquide glisser doucement d'un r\u00e9cipient \u00e0 l'autre."
-        ],
-        "kill": [
-            "Quelques secondes apr\u00e8s avoir bu votre potion, {target} s'\u00e9croule sur le sol. Vous esp\u00e8rez seulement ne pas vous \u00eatre tromp\u00e9e sur son compte..."
-        ],
         "resurrect": [
             "Vous courez aussi vite que vous le pouvez vers {target}. Vous portez la potion d'un bleu vif \u00e0 ses l\u00e8vres, et regardez la magie op\u00e9rer."
         ],
-        "resurrect_herself": [
-            "Vous vous jetez sur votre potion de vie, ouvrez son goulot et en avalez le contenu avant qu'il soit trop tard."
+        "try_to_kill_herself": [
+            "Vous avez bien fait de vous demander ce que contenait cette tasse avant de la boire ; \u00e0 d\u00e9faut de caf\u00e9 pour vous aider \u00e0 rester \u00e9veill\u00e9, cette potion aurait pu vous endormir. Pour toujours."
+        ],
+        "go_to_sleep": [
+            "Apr\u00e8s avoir touill\u00e9, m\u00e9lang\u00e9, distill\u00e9 ses potions, la sorci\u00e8re est retourn\u00e9e se coucher. Peut \u00eatre a-t-elle fait quelque chose de si lourd \u00e0 porter qu'elle ne dormira pas cette nuit."
+        ],
+        "try_to_resurrect_herself": [
+            "Peut \u00eatre que votre potion de vie aurait des effets positifs sur vous, mais vous n'avez jamais test\u00e9 cela sur un \u00eatre encore vivant. Vous r\u00e9sistez donc \u00e0 la tentation d'en boire."
+        ],
+        "tell_role": [
+            "Vous surveillez d'un oeil fatigu\u00e9 vos potions. L'une rouge, l'autre bleue. La vie et la mort. Vous sentez que ce soir, plus que jamais, vous en aurez besoin...\n[VOUS \u00caTES UNE SORCI\u00c8RE. ELIMINEZ LES LOUP-GAROUS POUR GAGNER]"
+        ],
+        "is_dying": [
+            "Vous projetiez d'aider quelqu'un cette nuit, mais il va falloir changer vos plans : vous \u00eates en sang, et si vous ne faitez rien, vous allez probablement mourir. Vous pouvez taper $resurrect pour vous ressuciter si vous poss\u00e8dez encore une potion de vie, ou faire une autre action : {killed_players} a/ont \u00e9t\u00e9 tu\u00e9(s) cette nuit. Vous poss\u00e8dez {death_potion} potion de mort et {resurrect_potion} potion de vie. Vous pouvez utiliser $kill <player>, $resurrect <player> ou $pass pour ne rien faire."
+        ],
+        "empty_death_potion": [
+            "Vous n'oterez la vie \u00e0 personne ce soir ; votre fiole de mort est vide, et vous avez oubli\u00e9 d'en pr\u00e9parer une seconde dose."
         ]
     },
     "werewolf": {
-        "tell_role": [
-            "Vous vous r\u00e9veillez au milieu de la nuit. Vos yeux rouges luisent \u00e9trangement dans le noir. Vous avez faim. Tr\u00e8s faim.\n[VOUS \u00caTES UN LOUP-GAROU. TUEZ TOUS LES VILLAGEOIS POUR GAGNER]"
-        ],
         "wakes_up": [
             "Un hurlement, puis deux, puis de plus en plus, se font entendre. Les loup-garous ont faim, et ils n'\u00e9pargneront personne."
         ],
         "turn": [
-            "Proposez une cible avec $kill <joueur>, ou montrer votre approbation pour la cible actuelle avec $confirm. Vous pouvez également consulter la liste des loup-garous avec $werewolfs. Lorsque tous les loup-garous ({werewolfs}) auront confirm\u00e9 pour la m\u00eame cible, celle-ci sera tu\u00e9e."
+            "Proposez une cible avec $kill <joueur>, ou montrer votre approbation pour la cible actuelle avec $confirm. Vous pouvez \u00e9galement consulter la liste des loup-garous avec $werewolfs. Lorsque tous les loup-garous ({werewolfs}) auront confirm\u00e9 pour la m\u00eame cible, celle-ci sera tu\u00e9e."
         ],
         "try_to_kill_werewolf": [
             "Oups ! Vous avez failli tuer un de vos amis ! Vous avez beau jou\u00efr d'une vision nocturne assez performante, elle n'est apparemment pas parfaite..."
         ],
-        "propose_target": [
-            "Vous faites signe \u00e0 vos compagnons. Depuis quelques jours, {target} a un comportement suspect. Peut-\u00eatre vaudrait-il mieux... \u00e9liminer la menace ? D\u00e9finitivement ?"
-        ],
-        "get_target_proposition": [
-            "{from_player} vous fait signe. Depuis quelques jours, {target} a un comportement suspect. Peut-\u00eatre vaudrait-il mieux... \u00e9liminer la menace ? D\u00e9finitivement ?"
-        ],
-        "not_agree": [
-            "Vous n'\u00eates pas d'accord pour tuer {old}. Il est peut-\u00eatre suspect, mais vous jugez mieux de cibler {new}, qui a des choses \u00e0 cacher, et \u00e7a se voit."
+        "no_target": [
+            "Vous avez beau hocher la t\u00eate comme si votre vie en d\u00e9pendait, personne ne vous comprend. \u00c7a a peut-\u00eatre un lien avec le fait que personne n'a encore propos\u00e9 de cible."
         ],
         "someone_doesnt_agree": [
             "{from_player} n'est pas d'accord pour tuer {old}. Il le trouve \u00e9galement suspect, mais il juge mieux de cibler {new}, qui a des choses \u00e0 cacher, et \u00e7a se voit."
         ],
-        "agree": [
-            "Vous \u00eates d'accord pour tuer {target}"
-        ],
-        "someone_agree": [
-            "{from_player} est d'accord pour tuer {target}"
-        ],
-        "no_target": [
-            "Vous avez beau hocher la t\u00eate comme si votre vie en d\u00e9pendait, personne ne vous comprend. \u00c7a a peut-\u00eatre un lien avec le fait que personne n'a encore propos\u00e9 de cible."
+        "tell_role": [
+            "Vous vous r\u00e9veillez au milieu de la nuit. Vos yeux rouges luisent \u00e9trangement dans le noir. Vous avez faim. Tr\u00e8s faim.\n[VOUS \u00caTES UN LOUP-GAROU. TUEZ TOUS LES VILLAGEOIS POUR GAGNER]"
         ],
         "go_to_sleep": [
             "Les loup-garous, apr\u00e8s avoir accompli leur sombre besogne, retournent chez eux, leur silhouette muscl\u00e9e et terrifiante clairement visible dans la lumi\u00e8re de la pleine lune."
         ],
         "done": [
             "{target} pousse un hurlement, puis plus rien. Vous ne vous sentez jamais aussi vivant qu'au moment de tuer."
+        ],
+        "someone_agree": [
+            "{from_player} est d'accord pour tuer {target}"
+        ],
+        "propose_target": [
+            "Vous faites signe \u00e0 vos compagnons. Depuis quelques jours, {target} a un comportement suspect. Peut-\u00eatre vaudrait-il mieux... \u00e9liminer la menace ? D\u00e9finitivement ?"
+        ],
+        "agree": [
+            "Vous \u00eates d'accord pour tuer {target}"
+        ],
+        "not_agree": [
+            "Vous n'\u00eates pas d'accord pour tuer {old}. Il est peut-\u00eatre suspect, mais vous jugez mieux de cibler {new}, qui a des choses \u00e0 cacher, et \u00e7a se voit."
+        ],
+        "get_target_proposition": [
+            "{from_player} vous fait signe. Depuis quelques jours, {target} a un comportement suspect. Peut-\u00eatre vaudrait-il mieux... \u00e9liminer la menace ? D\u00e9finitivement ?"
         ]
     },
-    "lovemaker": {
-        "tell_role": [
-            "Vous \u00e9tiez l\u00e0 incognito. Vous les avez longtemps observ\u00e9s pour \u00eatre s\u00fbr de votre choix. Maintenant, il est temps de jouer votre r\u00f4le.\n[VOUS \u00caTES CUPIDON. VOUS GAGNEZ SI LES VILLAGEOIS GAGNENT]"
+    "everyone": {
+        "invalid_vote_target": [
+            "Les r\u00e8gles sont claires : vous devez voter pour {authorized_targets}, et vous n'\u00eates pas s\u00fbr que votre vote soit pris en compte si vous faites autrement."
         ],
-        "wakes_up": [
-            "Cupidon, arm\u00e9 de son arc et de ses fl\u00e8ches, part dans le village, afin de trouver deux personnes qu'il liera \u00e0 la vie, mais surtout \u00e0 la mort."
+        "vote_begins": [
+            "Apr\u00e8s les \u00e9venements de cette nuit, la plupart des villageois du village d\u00e9cident de voter, afin d'\u00e9liminer quelqu'un qu'ils soupconnent d'\u00eatre un loup-garou. Ceci \u00e9tant \u00e9galement pour les loup-garous l'occasion d'\u00e9liminer quelques villageois de fa\u00e7on tout ce qu'il y a de plus l\u00e9gal, ils acceptent \u00e9galement, et tout le village se r\u00e9unit. [UTILISEZ $vote <joueur> POUR VOTER, $votes POUR CONSULTER LES VOTES, OU $pass POUR VOTER BLANC.] "
         ],
-        "turn": [
-            "Choisissez deux personnes \u00e0 faire tomber amoureux avec $love <j1> <j2>"
+        "player_was_killed_by_vote": [
+            "{player} se d\u00e9bat, argumente, crie puis enfin se r\u00e9soud \u00e0 \u00eatre tu\u00e9(e). Vous l'emmenez au milieu de la place pour en finir : il/elle \u00e9tait {role}"
         ],
-        "in_love": [
-            "Vous ne pouvez plus vous en emp\u00eacher. Malgr\u00e9 tous les dangers qui r\u00f4dent dehors, vous vous glissez par la porte, et marchez silencieusement vers une maison \u00e0 l'autre bout du village.\n[VOUS \u00caTES AMOUREU(X/SE) DE {lover}, QUI EST {role}. VOTRE NOUVEAU BUT EST QUE VOUS SOYEZ LES SEULS SURVIVANTS]"
+        "has_already_voted": [
+            "Vous avez d\u00e9j\u00e0 vot\u00e9, et n'\u00eates pas s\u00fbr que tricher rallierait les autres \u00e0 votre cause."
         ],
-        "target1_is_target2": [
-            "Vous vous plongez dans vos souvenirs. Vous vous rappellez la fois o\u00f9, en faisant tomber quelqu'un amoureux de lui-m\u00eame, il s'\u00e9tait noy\u00e9 dans une mare en voulant admirer son reflet... Il vaut peut-\u00eatre mieux ne pas r\u00e9iterer l'exp\u00e9rience."
+        "canceled_vote_by_equality": [
+            "{players} ayant \u00e0 plusieurs reprises re\u00e7u autant de votes, le vote est annul\u00e9, afin de ne pas \u00e0 avoir \u00e0 tirer au sort la vie d'une personne, peut-\u00eatre innocente."
         ],
-        "try_to_involve_himself": [
-            "C'est quand m\u00eame une fl\u00e8che qui se plante dans votre coeur, et \u00e7a ne doit pas \u00eatre tr\u00e8s agr\u00e9able. Vous d\u00e9cidez de ne pas essayer sur vous."
+        "lovers_won": [
+            "{lover1} et {lover2} sont seuls au monde. Ils se regardent, se prennent par la main, et quittent silencieusement ce lieu de mort et de d\u00e9solation, heureux d'\u00eatre \u00e0 deux et en vie.\nLES AMOUREUX ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n"
         ],
-        "done": [
-            "Satisfait de vous, vous vous rendormez paisiblement. Vous avez chang\u00e9 leur destin, mais c'est votre boulot, apr\u00e8s tout."
+        "werewolf_death_seen_by_villager": [
+            "{player} est mort(e) cette nuit. \u00c0 sa carrure forte et muscl\u00e9e, vous voyez qu'il s'agissait d'un loup-garou. Vous poussez un soupir de soulagement ; c'aurait pu \u00eatre l'un des votres..."
         ],
-        "go_to_sleep": [
-            "Cupidon, apr\u00e8s avoir choisi qui aimerait qui, retourne chez lui, dans l'anonymat, reprenant sa place de personne tout ce qu'il y a de plus normale au sein du village."
+        "villagers_won": [
+            "C'\u00e9tait le dernier. Apr\u00e8s de longues nuits blanches, vous avez enfin r\u00e9ussi \u00e0 \u00e9liminer tous les loups-garous !\nLES VILLAGEOIS ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n\n"
         ],
-        "killed_by_love": [
-            "Apr\u00e8s la mort de {lover}, {player} ne put tenir longtemps. La vie lui \u00e9tait insuportable. Il/elle se donna bient\u00f4t la mort, et \u00e9tait {role}"
+        "equality": [
+            "{players} sont \u00e0 \u00e9galit\u00e9. Le village d\u00e9cide donc d'organiser un {turn}\u00e8me tour de vote, o\u00f9 vous ne pouvez voter que pour eux"
+        ],
+        "you_are_dead": [
+            "[VOUS \u00caTES MORT. VOUS POUVEZ CONTINUEZ DE REGARDER LA PARTIE, OU LA QUITTER AVEC $quit]"
+        ],
+        "game_begins": [
+            "Une nouvelle aventure commence ! Y-survivrez vous ?"
+        ],
+        "killed_by_vote": [
+            "Malgr\u00e9 tout vos arguments pour les convaincre de ne pas vous tuer, vous \u00e9chouez. Vous \u00eates \u00e9xecut\u00e9(e) publiquement, sur la place du village, et votre identit\u00e9 est r\u00e9v\u00e9l\u00e9e au grand jour."
+        ],
+        "werewolf_death_seen_by_werewolf": [
+            "Vous retrouvez le corps de {player}. Les villageois sont heureux qu'il ne soit plus, et vous feignez de faire de m\u00eame, mais en r\u00e9alit\u00e9, vous jurez de leur faire payer cela \u00e0 la nuit tomb\u00e9e."
+        ],
+        "sleep": [
+            "Apr\u00e8s cette journ\u00e9e \u00e9puisante et lourde en sacrifices, vous d\u00e9cidez de vous endormir..."
+        ],
+        "white_vote": [
+            "{player} n'est pas s\u00fbr. il/elle se dit que ce serait peut \u00eatre mieux de ne pas voter, et d\u00e9pose un vote blanc. "
+        ],
+        "killed_by_night": [
+            "Lorsque vous vous r\u00e9veillez, vous vous sentez en proie \u00e0 une douleur atroce et, avant que vous n'ayez pu prononcer la moindre parole, vous n'\u00e9tiez d\u00e8j\u00e0 plus rien d'autre qu'un corps sans vie de plus dans ce village [VOUS \u00caTES MORT. VOUS POUVEZ CONTINUEZ DE REGARDER LA PARTIE, OU LA QUITTER AVEC $quit]."
+        ],
+        "villager_death_seen_by_villager": [
+            "{player} est mort(e). Ses v\u00eatements sont en lambeaux, et son corps est lac\u00e9r\u00e9 de toutes parts par d'\u00e9normes traces de griffe. Vous savez que ce n'\u00e9tait pas un loup-garou, et pleurez sa perte ; il ou elle \u00e9tait {role}."
+        ],
+        "villager_death_seen_by_werewolf": [
+            "{player} est \u00e9tendu(e) au travers de la chauss\u00e9e. Tant mieux. Il \u00e9tait {role}, et \u00e7a en fera un de moins pour vous mettre des b\u00e2tons dans les roues."
+        ],
+        "canceled_vote_by_white_votes": [
+            "Tout le monde ayant vot\u00e9 blanc, le vote est annul\u00e9. Personne ne sera tu\u00e9 aujourd'hui."
+        ],
+        "nobody_is_dead": [
+            "A votre grande surprise, personne n'est mort cette nuit... Vous en concluez que c'est une sorte de match nul entre les deux camps."
+        ],
+        "game_ended": [
+            "C'est la fin de cette partie ! En esp\u00e8rant que vous avez aim\u00e9 ! Vous pouvez discuter un peu, puis partir avec $quit, ou red\u00e9marrer une partie avec $again. La partie sera d\u00e9truite lorque tout le monde l'aura quitt\u00e9e."
+        ],
+        "first_sleep": [
+            "La journ\u00e9e a \u00e9t\u00e9 tr\u00e8s \u00e9puisante, et vous n'avez qu'une envie, dormir. Mais vous savez au fond de vous que cette nuit ne sera pas reposante... Vous mettez ces pressentiments de cot\u00e9 et vous vous couchez bien au chaud, sous votre couette."
+        ],
+        "villagers_dead_summary": [
+            "Cette nuit, votre village a \u00e9t\u00e9 le t\u00e9moin de meutres, et d'une barbarerie sans nom. Vous vous risquez hors de la maison et jetez une oeil dehors."
+        ],
+        "werewolfs_dead_summary": [
+            "La chasse de cette nuit \u00e9tait plut\u00f4t amusante, mais vous vous inqui\u00e8tez de la r\u00e9action des autres villageois. Vous sortez de votre maison, et risquez un oeil dehors."
+        ],
+        "has_voted": [
+            "{player} a vot\u00e9 contre {target} !"
+        ],
+        "werewolfs_won": [
+            "Ce village ne se rel\u00e8vera pas. Les loups-garou ont massacr\u00e9 tous les habitants, un par un. Mais ils ressentent de la fiert\u00e9, la fiert\u00e9 d'\u00eatre les seuls responsables de ce carnage. Ils le regardent une derni\u00e8re fois, puis s'enfoncent dans la for\u00eat, \u00e0 la recherche de nouvelles proies.\nLES LOUPS-GAROUS ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n"
         ]
     },
     "villager": {
@@ -196,29 +167,12 @@
             "Vous \u00eates bien dans ce village. La plupart de ses habitants sont sympatiques, et le paysage est beau et reposant. Mais fini d'observer passivement les disparitions et autres \u00e9venements \u00e9tranges. Vous devez faire quelque chose.\n[VOUS \u00caTES UN VILLAGEOIS. VOUS GAGNEZ SI TOUS LES LOUPS-GAROUS MEURENT]"
         ]
     },
-    "hunter": {
-        "tell_role": [
-            "Clic, clac. Le bruit du chargeur de votre p\u00e9toire vous rassure. Avec \u00e7a, personne ne vous emb\u00eatera. Et si Ils viennent quand m\u00eame, gare \u00e0 eux.\n[VOUS \u00caTES LE CHASSEUR. VOUS GAGNEZ SI LES VILLAGEOIS GAGNENT, ET POUVEZ TUER QUELQU'UN \u00c0 VOTRE MORT]"
-        ],
-        "injured": [
-            "{hunter}, saignant de plusieurs endroits et en bien piteux \u00eatat, rampe sur le sol en direction de son fusil, s'en empare, et, avant que vous n'ayez pu intervenir, presse la g\u00e2chette en rendant son dernier souffle."
-        ],
-        "turn": [
-            "Vous pouvez tuer une personne avant de mourir avec $kill <joueur>. Choisissez bien."
-        ],
-        "try_to_kill_himself": [
-            "M\u00eame si vous vouliez vraiment vous tuer vous-m\u00eame, \u00e7a ne serait pas n\u00e9cessaire. Au vu de l'\u00eatat dans lequel vous vous trouvez, votre esp\u00e8rance de vie se compte en secondes."
-        ],
-        "kill": [
-            "Vous vous effondrez sur le sol. Vous \u00eates peut \u00eatre en train de mourir, mais vous avez tir\u00e9 {target} dans votre tombe, qui \u00e9tait {role}."
-        ],
-        "die": [
-            "{hunter} pousse un dernier r\u00e2le, puis s'effondre, en m\u00eame temps que {target}, qui \u00e9tait {role}"
-        ]
-    },
     "seeker": {
-        "tell_role": [
-            "A travers les volutes brumeuses de votre boule de cristal, vous peinez \u00e0 voir l'avenir. Il semble ne pas \u00eatre clairement d\u00e9fini. C'est parce qu'il s'\u00e9crit ici et maintenant.\n[VOUS \u00caTES LA VOYANTE. VOUS GAGNEZ SI TOUS LES LOUPS-GAROUS MEURENT]"
+        "go_to_sleep": [
+            "La voyante, apr\u00e8s avoir consult\u00e9 sa boule de cristal, repart se coucher, en priant int\u00e9rieurement pour que ce qu'elle a d\u00e9couvert ne fasse pas d'elle une cible."
+        ],
+        "done": [
+            "Vous esp\u00e8rez que ces informations seront utiles au village une fois le joueur lev\u00e9. Si ce n'est pas le cas, vous avez fait de votre mieux."
         ],
         "wakes_up": [
             "La voyante nourrit des soup\u00e7ons. De gros sou\u00e7ons. Elle se reveille, et, d'un pas lent et ensommeill\u00e9, se dirige vers sa boule de cristal pour obtenir des r\u00e9ponses."
@@ -232,11 +186,57 @@
         "see_role": [
             "Les volutes de fum\u00e9e s'enroulent jusqu'\u00e0 former une image distincte de ce qu'est en train de faire {target}.\n[CE JOUEUR EST {role}]"
         ],
+        "tell_role": [
+            "A travers les volutes brumeuses de votre boule de cristal, vous peinez \u00e0 voir l'avenir. Il semble ne pas \u00eatre clairement d\u00e9fini. C'est parce qu'il s'\u00e9crit ici et maintenant.\n[VOUS \u00caTES LA VOYANTE. VOUS GAGNEZ SI TOUS LES LOUPS-GAROUS MEURENT]"
+        ]
+    },
+    "hunter": {
+        "die": [
+            "{hunter} pousse un dernier r\u00e2le, puis s'effondre, en m\u00eame temps que {target}, qui \u00e9tait {role}"
+        ],
+        "turn": [
+            "Vous pouvez tuer une personne avant de mourir avec $kill <joueur>. Choisissez bien."
+        ],
+        "kill": [
+            "Vous vous effondrez sur le sol. Vous \u00eates peut \u00eatre en train de mourir, mais vous avez tir\u00e9 {target} dans votre tombe, qui \u00e9tait {role}."
+        ],
+        "try_to_kill_himself": [
+            "M\u00eame si vous vouliez vraiment vous tuer vous-m\u00eame, \u00e7a ne serait pas n\u00e9cessaire. Au vu de l'\u00eatat dans lequel vous vous trouvez, votre esp\u00e8rance de vie se compte en secondes."
+        ],
+        "tell_role": [
+            "Clic, clac. Le bruit du chargeur de votre p\u00e9toire vous rassure. Avec \u00e7a, personne ne vous emb\u00eatera. Et si Ils viennent quand m\u00eame, gare \u00e0 eux.\n[VOUS \u00caTES LE CHASSEUR. VOUS GAGNEZ SI LES VILLAGEOIS GAGNENT, ET POUVEZ TUER QUELQU'UN \u00c0 VOTRE MORT]"
+        ],
+        "injured": [
+            "{hunter}, saignant de plusieurs endroits et en bien piteux \u00eatat, rampe sur le sol en direction de son fusil, s'en empare, et, avant que vous n'ayez pu intervenir, presse la g\u00e2chette en rendant son dernier souffle."
+        ]
+    },
+    "lovemaker": {
+        "try_to_involve_himself": [
+            "C'est quand m\u00eame une fl\u00e8che qui se plante dans votre coeur, et \u00e7a ne doit pas \u00eatre tr\u00e8s agr\u00e9able. Vous d\u00e9cidez de ne pas essayer sur vous."
+        ],
+        "target1_is_target2": [
+            "Vous vous plongez dans vos souvenirs. Vous vous rappellez la fois o\u00f9, en faisant tomber quelqu'un amoureux de lui-m\u00eame, il s'\u00e9tait noy\u00e9 dans une mare en voulant admirer son reflet... Il vaut peut-\u00eatre mieux ne pas r\u00e9iterer l'exp\u00e9rience."
+        ],
         "done": [
-            "Vous esp\u00e8rez que ces informations seront utiles au village une fois le joueur lev\u00e9. Si ce n'est pas le cas, vous avez fait de votre mieux."
+            "Satisfait de vous, vous vous rendormez paisiblement. Vous avez chang\u00e9 leur destin, mais c'est votre boulot, apr\u00e8s tout."
+        ],
+        "killed_by_love": [
+            "Apr\u00e8s la mort de {lover}, {player} ne put tenir longtemps. La vie lui \u00e9tait insuportable. Il/elle se donna bient\u00f4t la mort, et \u00e9tait {role}"
+        ],
+        "turn": [
+            "Choisissez deux personnes \u00e0 faire tomber amoureux avec $love <j1> <j2>"
         ],
         "go_to_sleep": [
-            "La voyante, apr\u00e8s avoir consult\u00e9 sa boule de cristal, repart se coucher, en priant int\u00e9rieurement pour que ce qu'elle a d\u00e9couvert ne fasse pas d'elle une cible."
+            "Cupidon, apr\u00e8s avoir choisi qui aimerait qui, retourne chez lui, dans l'anonymat, reprenant sa place de personne tout ce qu'il y a de plus normale au sein du village."
+        ],
+        "wakes_up": [
+            "Cupidon, arm\u00e9 de son arc et de ses fl\u00e8ches, part dans le village, afin de trouver deux personnes qu'il liera \u00e0 la vie, mais surtout \u00e0 la mort."
+        ],
+        "tell_role": [
+            "Vous \u00e9tiez l\u00e0 incognito. Vous les avez longtemps observ\u00e9s pour \u00eatre s\u00fbr de votre choix. Maintenant, il est temps de jouer votre r\u00f4le.\n[VOUS \u00caTES CUPIDON. VOUS GAGNEZ SI LES VILLAGEOIS GAGNENT]"
+        ],
+        "in_love": [
+            "Vous ne pouvez plus vous en emp\u00eacher. Malgr\u00e9 tous les dangers qui r\u00f4dent dehors, vous vous glissez par la porte, et marchez silencieusement vers une maison \u00e0 l'autre bout du village.\n[VOUS \u00caTES AMOUREU(X/SE) DE {lover}, QUI EST {role}. VOTRE NOUVEAU BUT EST QUE VOUS SOYEZ LES SEULS SURVIVANTS]"
         ]
     }
 }
