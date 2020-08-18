@@ -2,8 +2,7 @@
 
 
 import discord
-from discord.utils import get
-import asyncio
+import logging
 
 from bot import GameMaster
 from assets.utils import assure_assertions
@@ -69,9 +68,13 @@ async def on_member_join(member):
 
 
 if __name__ == '__main__':
-    try:
-        # Launch the bot
-        bot.run(token.TOKEN)
-    finally:
-        # Recording the dialogs
-        bot.dialogs.save(consts.DIALOGS_PATH)
+    while True:
+        try:
+            # Launch the bot
+            bot.run(token.TOKEN)
+        except BaseException as e:
+            print("Killed by %s" % e)
+        finally:
+            # Recording the dialogs
+            bot.dialogs.save(consts.DIALOGS_PATH)
+
