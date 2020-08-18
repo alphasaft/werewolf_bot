@@ -77,3 +77,4 @@ if __name__ == '__main__':
         # Recording the dialogs
         bot.dialogs.save(consts.DIALOGS_PATH)
 
+

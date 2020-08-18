@@ -12,7 +12,7 @@ BASE_ROLE = "Manant"
 
 # Game constants
 
-DIALOGS_PATH = "/home/louise/PycharmProjects/werewolf/game/dialogs/story.json"
+DIALOGS_PATH = "../story.json"
 MINIMUM_PLAYERS = 1
 ALLTIMES_CMDS = ('admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes')
 WHITE_VOTE = "Vote blanc"

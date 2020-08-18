@@ -22,7 +22,7 @@ class StoryBook(dict):
     def _get_dialogs(self, file):
         """Internal function to read the json file."""
         with open(file, 'r') as json_file:
-            all_dialogs = json.loads(bytes(json_file.read(), "utf-8"))
+            all_dialogs = json.loads(json_file.read())
 
         for chapter, chapter_content in all_dialogs.items():
             self[chapter] = _StoryChapter()
