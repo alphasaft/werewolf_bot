@@ -68,13 +68,12 @@ async def on_member_join(member):
 
 
 if __name__ == '__main__':
-    while True:
-        try:
-            # Launch the bot
-            bot.run(token.TOKEN)
-        except BaseException as e:
-            print("Killed by %s" % e)
-        finally:
-            # Recording the dialogs
-            bot.dialogs.save(consts.DIALOGS_PATH)
+    try:
+        # Launch the bot
+        bot.run(token.TOKEN)
+    except BaseException as e:
+        print("Killed by %s" % e)
+    finally:
+        # Recording the dialogs
+        bot.dialogs.save(consts.DIALOGS_PATH)
 
