@@ -17,7 +17,7 @@ class NicknamesStep(BaseStep):
     async def start(self, roles: Roles, dialogs):
         self.__init__()
         for name, role in roles.items():
-            if not (name.isalnum() and len(name) <= 10 and " " not in name):
+            if not (name.isalnum() and len(name) <= 15 and " " not in name):
                 await role.send(block(msgs.BAD_NAME % name))
                 self.waiting_for_nicknames.append(role)
             else:
@@ -32,7 +32,7 @@ class NicknamesStep(BaseStep):
 
         try:
             new_nickname = unpack(args, "!nickname unPseudo")
-            assert new_nickname.isalnum() and len(new_nickname) <= 10, msgs.INVALID_NICKNAME % new_nickname
+            assert new_nickname.isalnum() and len(new_nickname) <= 15, msgs.INVALID_NICKNAME % new_nickname
             assert author not in self.confirmed, msgs.NICKNAME_ALREADY_CONFIRMED % roles.get_name_by_id(author.user.id)
             assert not roles.get_role_by_name(new_nickname), \
                 msgs.NICKNAME_ALREADY_TAKEN % (new_nickname, roles.get_role_by_name(new_nickname).user.mention)

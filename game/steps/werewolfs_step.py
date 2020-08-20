@@ -24,7 +24,7 @@ class WereWolfsStep(BaseStep):
         if len(werewolfs) >= 2:
             fmt = ", ".join(roles.get_name_by_id(w.id) for w in werewolfs[:-1]) + " et " + roles.get_name_by_id(werewolfs[-1].id)
         else:
-            fmt = werewolfs[0]
+            fmt = roles.get_name_by_id(werewolfs[0])
 
         await roles.everyone.send(dialogs.werewolf.wakes_up.tell())
         await roles.were_wolfs.only_alive().send(dialogs.werewolf.turn.tell(werewolfs=fmt))
@@ -109,7 +109,7 @@ class WereWolfsStep(BaseStep):
         await author.send(embed=msgs.GET_WEREWOLFS.build(
             werewolfs=",\n- ".join(roles.get_name_by_id(w.id) for w in roles.were_wolfs.only_alive()),
             target=self.targeted or "encore personne",
-            agree=", ".join(self.agree_players) if self.agree_players else "encore personne"
+            agree=", ".join(roles.get_role_by_id(w.id) for w in self.agree_players) if self.agree_players else "encore personne"
         ))
 
     async def external_quit_cmd(self, args, author, roles, dialogs, session):

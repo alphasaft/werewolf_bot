@@ -12,9 +12,9 @@ BASE_ROLE = "Manant"
 
 # Game constants
 
-DIALOGS_PATH = "../story.json"
+DIALOGS_PATH = "game/dialogs/story.json"
 MINIMUM_PLAYERS = 1
-ALLTIMES_CMDS = ('admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes')
+ALLTIMES_CMDS = ('admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes', 'again', 'kick')
 WHITE_VOTE = "Vote blanc"
 
 

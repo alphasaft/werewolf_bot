@@ -63,12 +63,12 @@ class HunterStep(BaseStep):
 
     async def help_cmd(self, args, author, roles, dialogs):
         """ `*help (full)` : Vous indique ce que vous devez faire ; tapez $help full pour un guide complet"""
-        # We redefine help because its default comportement is to send the external help if the author is dead
+        # We redefine help because its default comportment is to send the external help if the author is dead
         if author.role == HUNTER:
             await self.info(to=author, msg=self.active_help)
         else:
             await self.info(to=author, msg=self.external_help)
 
     async def end(self, roles, dialogs):
-        self._done = True  # The hunter can't die twice so this step is definitively over
+        self.__class__._done = True  # The hunter can't die twice so this step is definitively over
         await BaseStep.end(self, roles, dialogs)

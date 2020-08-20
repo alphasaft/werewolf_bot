@@ -23,7 +23,7 @@ class EndStep(BaseStep):
         if len(roles.alive_players) == 2 and list(roles.alive_players)[0].loving == list(roles.alive_players)[1]:
             await roles.everyone.send(dialogs.everyone.lovers_won.tell(
                 lover1=roles.get_name_by_id(list(roles.alive_players)[0].id),
-                lover2=roles.get_name_by_id(list(roles.alive_players)[0].id),
+                lover2=roles.get_name_by_id(list(roles.alive_players)[1].id),
                 roles=roles_summary
             ))
 

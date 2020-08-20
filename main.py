@@ -2,10 +2,10 @@
 
 
 import discord
-import logging
 
 from bot import GameMaster
 from assets.utils import assure_assertions
+import assets.logger as logger
 import assets.token as token
 import assets.messages as msgs
 import assets.constants as consts
@@ -14,6 +14,11 @@ import commands
 # Checking that assertion will work.
 assure_assertions()
 
+# Preparation for the logger
+logger.set_level(logger.Level.DEBUG)
+logger.set_format("{level} : At {datetime} : {message}")
+
+# Implementing commands
 bot = GameMaster(command_prefix=consts.PREFIX, description=consts.DESCRIPTION, case_insensitive=True)
 commands.game_cmd.__implement__(bot)
 commands.clear_cmd.__implement__(bot)
@@ -22,24 +27,26 @@ commands.embed_cmd.__implement__(bot)
 commands.tests_cmd.__implement__(bot)
 
 
+# Implementing events
 @bot.event
 async def on_ready():
-    print(bot.user.name, 'is ready !')
-    print('Id :', bot.user.id)
-    print('------')
+    logger.info("Ready as %s with id %s" % (bot.user.name, bot.user.id))
 
 @bot.event
 async def on_connect():
-    print("(Re)connected")
+    logger.info("(Re)connected")
 
 
 @bot.event
 async def on_disconnect():
-    print('Disconnected')
+    logger.warn("Disconnected")
 
 
 @bot.event
 async def on_message(msg):
+    if not msg.author.bot:
+        logger.debug("'%s' was sended by %s" % (msg.content, msg.author.display_name))
+
     if msg.author == bot.user:
         return  # We don't want the bot to reply to itself !
 
@@ -53,8 +60,12 @@ async def on_message(msg):
                 return
 
             msg = bot.devtool.transform_msg(msg)
+            logger.debug("Message author was truncated for %s" % msg.author.name)
+
+        logger.debug("Reacting to the message...")
         await bot.react(msg)
-    else:
+    elif msg.content.strip().startswith(consts.PREFIX):
+        logger.debug("Processing the message as a command...")
         await bot.process_commands(msg)
 
 
@@ -69,12 +80,14 @@ async def on_member_join(member):
 
 if __name__ == '__main__':
     try:
+        logger.info("Process started")
+
         # Launch the bot
         bot.run(token.TOKEN)
     except BaseException as e:
-        print("Killed by %s" % e)
+        logger.critical("Killed by %s : %s" % (e.__class__.__name__, e))
     finally:
         # Recording the dialogs
         bot.dialogs.save(consts.DIALOGS_PATH)
 
-
+        logger.info("Process ended")

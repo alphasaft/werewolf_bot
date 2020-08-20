@@ -1,5 +1,6 @@
 from assets.utils import italic, bold, indented, suppress_markdown, suppress, unpack
 from assets.constants import ALLTIMES_CMDS, PREFIX
+import assets.logger as logger
 import assets.messages as msgs
 
 

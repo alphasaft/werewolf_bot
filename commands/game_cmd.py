@@ -1,8 +1,10 @@
 from discord.utils import get
-from assets import messages as msgs
+
 from bot.game_master import GameMaster
 from assets.utils import get_id, make_mention
 from assets.constants import EXPEDITIONS_CATEGORY
+import assets.messages as msgs
+import assets.logger as logger
 
 
 BRIEF = """Crée, supprime et gère vos parties."""
@@ -44,6 +46,7 @@ def __implement__(bot: GameMaster):
             return
 
         bot.add_game(game_name, ctx.author, home_channel=ctx.channel)
+        logger.info("%s created a game named %s" % (ctx.author.name, game_name))
         await ctx.channel.send(msgs.SUCCESSFULLY_CREATED % (game_name, game_name))
 
     # Join a game session
@@ -59,6 +62,7 @@ def __implement__(bot: GameMaster):
             return
 
         bot.join_game(game_name, ctx.author)
+        logger.info("%s joined the game named %s " % (ctx.author.nale, game_name))
         await ctx.channel.send(msgs.SUCCESSFULLY_JOINED % game_name)
 
     # Change the admin of a game session
@@ -100,10 +104,12 @@ def __implement__(bot: GameMaster):
 
             elif confirm:
                 bot.delete_game(game_name)
+                logger.info("Game %s was deleted by its owner %s" % (ctx.author.name, game_name))
                 await ctx.channel.send(msgs.SUCCESSFULLY_DELETED % game_name)
 
         else:
             bot.quit_game(ctx.author.id)
+            logger.info("%s quited the game %s" % (ctx.author.name, bot.which_game(ctx.author.id)))
             await ctx.channel.send(msgs.SUCCESSFULLY_QUITED % game_name)
 
     # Kick a player from your game
@@ -123,6 +129,7 @@ def __implement__(bot: GameMaster):
 
         game = bot.which_game(player)
         bot.quit_game(player)
+        logger.info("%s was kicked of the game %s" % (ctx.author.name, bot.which_game(ctx.author.id)))
         await ctx.channel.send(msgs.SUCCESSFULLY_KICKED % (make_mention(player), game))
 
     # Get the list of the available games
@@ -174,6 +181,7 @@ def __implement__(bot: GameMaster):
             )
             members = [member.mention for member in bot.get_game_members(game_name)]
             await bot.launch_game(game_name)
+            logger.info("Game %s was started by its owner %s" % (ctx.author.name, game_name))
             await ctx.channel.send(embed=msgs.GAME_START.build(members="\n- ".join(members)))
 
 

@@ -205,7 +205,7 @@ MISSING_USER = """
 BAD_NAME = """
 Votre nom (%s) ne peut pas être utilisé tel quel pour jouer, merci de choisir un pseudonyme pour cette partie avec \
 $nickname unPseudo, puis de confirmer avec $confirm. Le pseudonyme choisi doit ne pas comporter d'espaces, \
-n'être composé que de chiffres et/ou lettres et ne pas dépasser 10 caractères.
+n'être composé que de chiffres et/ou lettres et ne pas dépasser 15 caractères.
 """
 
 CHOOSE_NICKNAME = """
@@ -218,7 +218,7 @@ Merci de d'abord choisir votre pseudonyme. La partie ne commencera qu'après.
 """
 
 INVALID_NICKNAME = """
-Pseudonyme invalide '%s' (le pseudonyme doit avoir une longueur de 10 caractères maximum, être uniquement \
+Pseudonyme invalide '%s' (le pseudonyme doit avoir une longueur de 15 caractères maximum, être uniquement \
 alphanumérique, et ne pas comporter d'espaces).
 """
 
