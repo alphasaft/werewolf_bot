@@ -33,7 +33,7 @@ async def on_ready():
     logger.info("Ready as %s with id %s" % (bot.user.name, bot.user.id))
     while True:
         try:
-            await asyncio.sleep(3*60)
+            await asyncio.sleep(consts.HOOK_DELAY)
             await bot.get_channel(consts.HOOK_CHANNEL).send(
                 "Bot currently connected (%s)" % datetime.datetime.fromtimestamp(time.time())
             )
