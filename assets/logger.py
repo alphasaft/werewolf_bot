@@ -77,8 +77,7 @@ class Logger:
             )
 
             # We force the message to be written instantly
-            print(_fmt, file=self._output)
-            self._output.flush()
+            print(_fmt, file=self._output, flush=True)
             os.sync()
 
     def debug(self, message: str):
