@@ -4,7 +4,7 @@
 import discord
 
 from bot import GameMaster
-from assets.utils import assure_assertions
+from assets.utils import assure_assertions, configure_logger
 import assets.logger as logger
 import assets.token as token
 import assets.messages as msgs
@@ -15,8 +15,7 @@ import commands
 assure_assertions()
 
 # Preparation for the logger
-logger.set_level(logger.Level.DEBUG)
-logger.set_format("{level} : At {datetime} : {message}")
+configure_logger(logger)
 
 # Implementing commands
 bot = GameMaster(command_prefix=consts.PREFIX, description=consts.DESCRIPTION, case_insensitive=True)

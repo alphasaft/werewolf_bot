@@ -1,5 +1,10 @@
 import game.steps
 import assets.logger as logger
+from assets.utils import configure_logger
+
+
+# Logger configuration
+configure_logger(logger)
 
 
 class StepList:
@@ -26,6 +31,7 @@ class StepList:
 
     def _generate_turn(self):
         """Create a new turn : night + day"""
+        logger.debug("A new game turn was generated")
         self._steps.extend(self._turn or [])
 
     def _check_game_is_over(self, roles):

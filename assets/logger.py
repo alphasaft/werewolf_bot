@@ -4,10 +4,10 @@ lot of useless info.
 """
 
 import sys
+import os
 import enum
 import time
 import datetime
-import logging
 
 
 class Level(enum.Enum):
@@ -17,10 +17,18 @@ class Level(enum.Enum):
     WARNING = 20
     ERROR = 30
     CRITICAL = 40
+    OFF = 50
+
+
+# Base formats
+
+CLASSIC_FMT = "{level} : {message}"
+MESSAGE_FMT = "{message}"
+DATED_FMT = "{level} : At {datetime} : {message}"
 
 
 class Logger:
-    def __init__(self, level, *, fmt="{level} : {message}", file=sys.stderr, filemode="a"):
+    def __init__(self, level, *, fmt=CLASSIC_FMT, file=sys.stderr, filemode="a"):
         """
         Initialize self
 
@@ -29,6 +37,8 @@ class Logger:
 
         level - The severity level of the logger
         fmt - The format for the log
+        file - a string or an IO object for the logs
+        filemode - if file is specified and a string, the builtin function open will use this filemode to open it
         """
         self._output = None
         self.set_output(file, filemode)
@@ -50,6 +60,15 @@ class Logger:
         In fact, this prints the message (using the chosen format) with print() into the output file of the logger
         (sys.stderr by default)
         """
+
+        try:
+            Level(level)
+        except ValueError:
+            raise ValueError("LEVEL parameter must be a Level enum")
+
+        if level == Level.OFF:
+            raise ValueError("OFF level should only be used to prevent the logger to send any message")
+
         if self.enabled_for(level):
             _fmt = self._fmt.format(
                 datetime=datetime.datetime.fromtimestamp(time.time()),
@@ -57,7 +76,10 @@ class Logger:
                 message=message
             )
 
+            # We force the message to be written instantly
             print(_fmt, file=self._output)
+            self._output.flush()
+            os.fsync(self._output.fileno())
 
     def debug(self, message: str):
         """Log MESSAGE with severity 'DEBUG'"""
@@ -106,6 +128,11 @@ class Logger:
         if self._level_fixed:
             raise NameError("set_level() can be called only once !")
 
+        try:
+            Level(level)
+        except ValueError:
+            raise ValueError("LEVEL parameter must be a Level")
+
         self._level = level
         self._level_fixed = True
 
@@ -124,3 +151,7 @@ critical = _ROOT_LOGGER.critical
 set_output = _ROOT_LOGGER.set_output
 set_format = _ROOT_LOGGER.set_format
 set_level = _ROOT_LOGGER.set_level
+
+
+def config(level=Level.WARNING, output=sys.stderr, format="{"):
+    """Configure the root logger"""

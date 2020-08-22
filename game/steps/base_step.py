@@ -1,7 +1,11 @@
-from assets.utils import italic, bold, indented, suppress_markdown, suppress, unpack
+from assets.utils import italic, bold, indented, suppress_markdown, suppress, unpack, configure_logger
 from assets.constants import ALLTIMES_CMDS, PREFIX
 import assets.logger as logger
 import assets.messages as msgs
+
+
+# Logger configuration
+configure_logger(logger)
 
 
 class BaseStep:
@@ -64,22 +68,29 @@ class BaseStep:
         If MSG looks like a command where "$" where omitted, warn the user and doesn't redirect the message.
         Default redirection is everyone.
         """
-        if (self.active_role and
-            roles.get_role_by_id(msg.author.id).role == self.active_role and
-            (hasattr(self, msg.content.strip().split()[0]+'_cmd'))
-           ):
-            await self.error(
-                to=msg.author,
-                msg="Attention ! Ce message ressemble fortement à une commande, et il ne faudrait pas que les autres "
-                    "te surprennent ! [CE MESSAGE N'A PAS ÉTÉ RELAYÉ ; UTILISE $public monMessage SI TU VEUX VRAIMENT "
-                    "L'ENVOYER À TOUS LES JOUEURS]"
+        try:
+            if (self.active_role and
+                roles.get_role_by_id(msg.author.id).role == self.active_role and
+                (hasattr(self, msg.content.strip().split()[0]+'_cmd'))
+            ):
+                await self.error(
+                    to=msg.author,
+                    msg="Attention ! Ce message ressemble fortement à une commande, et il ne faudrait pas que les "
+                        "autres te surprennent ! [CE MESSAGE N'A PAS ÉTÉ RELAYÉ ; UTILISE $public monMessage SI TU "
+                        "VEUX VRAIMENT L'ENVOYER À TOUS LES JOUEURS]"
+                )
+            else:
+                await self.redirect(
+                    from_=roles.get_name_by_id(msg.author.id),
+                    to=roles.everyone.exclude(msg.author.id),
+                    msg=msg.content
+                )
+
+        except Exception as e:
+            logger.error(
+                "The redirection of the message '%s' raised a(n) %s : %s" % (msg.content, e.__class__.__name, e)
             )
-        else:
-            await self.redirect(
-                from_=roles.get_name_by_id(msg.author.id),
-                to=roles.everyone.exclude(msg.author.id),
-                msg=msg.content
-            )
+            await self.error(to=msg.author, msg=msgs.MESSAGE_HAS_RAISED % msg.content)
 
     async def react(self, cmd, args, author, roles, dialogs, session, disable_checks=False):
         """Reacts to a command, such as $kill or $vote."""
@@ -93,12 +104,33 @@ class BaseStep:
                 await author.send(msgs.WRONG_ROLE)
                 return
 
-        if hasattr(self, cmd + '_cmd'):
-            await getattr(self, cmd + '_cmd')(args, author, roles, dialogs)
-        elif hasattr(self, 'external_' + cmd + '_cmd'):
-            await getattr(self, 'external_' + cmd + '_cmd')(args, author, roles, dialogs, session)
+        try:
+            if hasattr(self, cmd + '_cmd'):
+                await getattr(self, cmd + '_cmd')(args, author, roles, dialogs)
+            elif hasattr(self, 'external_' + cmd + '_cmd'):
+                await getattr(self, 'external_' + cmd + '_cmd')(args, author, roles, dialogs, session)
+            else:
+                await self.command_not_found(cmd, author)
+
+        except Exception as e:
+            fmt = "'%s %s' command invocation raised a(n) %s : %s" % (
+                cmd, " ".join(args), e.__class__.__name__, str(e) or "[no further info]"
+            )
+            logger.error(fmt)
+            await self.error(to=author, msg=msgs.COMMAND_HAS_RAISED % cmd)
+
         else:
-            await self.command_not_found(cmd, author)
+            logger.debug("La commande de jeu '%s' vient d'être invoquée avec succès par %s" % (cmd, author.user.name))
+
+    async def skip_cmd(self, args, author, roles, dialogs):
+        """ `*skip` : Passe cette étape du jeu. À n'utiliser qu'en cas de problèmes."""
+        try:
+            assert not args, msgs.TOO_MUCH_PARAMETERS % (", ".join(args), "$skip")
+            roles.check_is_admin(author)
+        except Exception as e:
+            await self.error(to=author, msg=e)
+
+        await BaseStep.end(self, roles, dialogs)
 
     async def public_cmd(self, args, author, roles, dialogs):
         """ `*public monMessage` : Force l'envoi de ce message à tous les joueurs """
@@ -132,7 +164,7 @@ class BaseStep:
                     (
                         "vivant(e)" if not player.injured and player.alive else
                         "mort(e)" if player.injured and player.alive else
-                        "définitivement mort(e)"
+                        player.role
                      )
                 )
                 for nickname, player in roles.items()
@@ -155,6 +187,15 @@ class BaseStep:
 
     async def external_quit_cmd(self, args, author, roles, dialogs, session):
         """ `*quit` : Quitte définitivement la partie """
+
+        if author.user == roles.admin and not len(roles) == 1:
+            candidates = list(roles.values())
+            if candidates[0] == author:
+                roles.admin = candidates[1].user
+            else:
+                roles.admin = candidates[0].user
+
+            await self.info(to=author, msg="Votre role d'admin vient d'être transféré à %s" % roles.admin.name)
 
         await self.info(
             to=roles.everyone,

@@ -112,19 +112,10 @@ class GameBot(OfflineBot):
         await self.session.react(msg)
 
 
-def async_error_pusher(f):
-    async def wrapper(*args, **kwargs):
-        try:
-            await f(*args, **kwargs)
-        except:
-            raise
-    return wrapper
-
-
 if __name__ == "__main__":
     async def main():
         players = [OfflineUser("Alphasaft"), OfflineUser("Blueberry"), OfflineUser("Ecta"), OfflineUser("Lucifer"), OfflineUser("Dridri"), OfflineUser("Wera"), OfflineUser('Hello')]
-        session = Session("offline", players[0], StoryBook(consts.DIALOGS_PATH))
+        session = Session("offline", players[0], None, StoryBook(consts.DIALOGS_PATH))
         bot = GameBot(session)
         game_dm_channels = OfflineBotDmChannels("test", players, bot=bot)
 

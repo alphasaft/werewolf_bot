@@ -1,6 +1,7 @@
 import discord
 from contextlib import contextmanager
 import assets.messages as msgs
+import assets.logger as logger
 
 
 class _DiscordFormatter:
@@ -100,6 +101,12 @@ def assure_assertions():
     """Checks that __debug__ isn't False, because else the assertions won't work."""
     if not __debug__:
         raise EnvironmentError("This couldn't be run with option -O, because assertions are needed.")
+
+
+def configure_logger(_logger):
+    """Prepare the logger config. _LOGGER can either be a logger.Logger object, or the logger module itself."""
+    _logger.set_level(logger.Level.WARNING)
+    _logger.set_format(logger.DATED_FMT)
 
 
 def on_channel(channel_name: str, contains: bool = False, warn: bool = False):

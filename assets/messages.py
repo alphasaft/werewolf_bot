@@ -303,6 +303,17 @@ GAME_HAS_ENDED = """
 > Les membres de l'expédition %s sont de retour !
 """
 
+COMMAND_HAS_RAISED = """
+La commande que vous venez de lancer ($%s ...) a provoqué une erreur (qui sera relayée le plus vite possible aux \
+développeurs). Si vous n'arrivez pas à la contourner, demandez à l'administrateur de votre partie d'utiliser $skip \
+pour passer à l'étape de jeu suivante. 
+"""
+
+MESSAGE_HAS_RAISED = """
+Le message que vous avez envoyé (%s) a provoqué une erreur lors de son envoi aux autres joueurs. Le problème sera \
+rapidement relayé aux développeurs afin de le résoudre.
+"""
+
 
 # --- Game beginner's guide ---
 
