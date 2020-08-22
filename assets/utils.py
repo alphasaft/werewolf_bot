@@ -1,5 +1,4 @@
 import discord
-import sys
 import assets.messages as msgs
 import assets.logger as logger
 
@@ -103,7 +102,7 @@ def assure_assertions():
         raise EnvironmentError("This couldn't be run with option -O, because assertions are needed.")
 
 
-def configure_logger(_logger, level=None, fmt=None, file=None, filemode=None):
+def configure_logger(_logger, level=None, fmt=None, file=None, filemode=None, tee=True):
     """
     Prepare the logger config. _LOGGER can either be a logger.Logger object, or the logger.py file itself.
     Default configuration is
@@ -111,14 +110,23 @@ def configure_logger(_logger, level=None, fmt=None, file=None, filemode=None):
     LEVEL: logger.Level.INFO,
     FMT : logger.DATED_FMT,
     FILE: ".log",
-    FILEMODE: "a"
+    FILEMODE: "a",
+    TEE: True
     """
+
     try:
         _logger.set_level(level or logger.Level.INFO)
     except NameError:
         pass
+
     _logger.set_format(fmt or logger.DATED_FMT)
     _logger.set_output(file=file or '.log', filemode=filemode or 'a')
+
+    if tee:
+        _logger.enable_tee()
+    else:
+        _logger.disable_tee()
+
 
 
 def on_channel(channel_name: str, contains: bool = False, warn: bool = False):

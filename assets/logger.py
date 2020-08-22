@@ -28,7 +28,7 @@ DATED_FMT = "{level} : At {datetime} : {message}"
 
 
 class Logger:
-    def __init__(self, level, *, fmt=CLASSIC_FMT, file=sys.stderr, filemode="a"):
+    def __init__(self, level, *, fmt=CLASSIC_FMT, file=sys.stderr, filemode="a", tee=False):
         """
         Initialize self
 
@@ -36,9 +36,10 @@ class Logger:
         ----------
 
         level - The severity level of the logger
-        fmt - The format for the log
+        fmt - The format for the log ; see self.set_format() for more info
         file - a string or an IO object for the logs
         filemode - if file is specified and a string, the builtin function open will use this filemode to open it
+        tee - if provided and True, prints every logged info in FILE and in sys.stdout
         """
         self._output = None
         self.set_output(file=file, filemode=filemode)
@@ -46,6 +47,8 @@ class Logger:
         self._level = level
         self._level_fixed = False
         self._fmt = fmt
+
+        self._tee = tee
 
     def enabled_for(self, level):
         """
@@ -78,6 +81,9 @@ class Logger:
 
             # We force the message to be written instantly
             print(_fmt, file=self._output, flush=True)
+            if self._tee:
+                print(_fmt, flush=True)
+
             os.sync()
 
     def debug(self, message: str):
@@ -135,6 +141,14 @@ class Logger:
         self._level = level
         self._level_fixed = True
 
+    def enabled_tee(self):
+        """Enables the 'tee' option"""
+        self._tee = True
+
+    def disable_tee(self):
+        """Disables the 'tee' option"""
+        self._tee = False
+
 
 # Export
 _ROOT_LOGGER = Logger(Level.WARNING)
@@ -150,7 +164,5 @@ critical = _ROOT_LOGGER.critical
 set_output = _ROOT_LOGGER.set_output
 set_format = _ROOT_LOGGER.set_format
 set_level = _ROOT_LOGGER.set_level
-
-
-def config(level=Level.WARNING, output=sys.stderr, format="{"):
-    """Configure the root logger"""
+enabled_tee = _ROOT_LOGGER.enabled_tee
+disable_tee = _ROOT_LOGGER.disable_tee

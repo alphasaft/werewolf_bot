@@ -90,7 +90,7 @@ class BaseStep:
 
         except Exception as e:
             logger.error(
-                "The redirection of the message '%s' raised a(n) %s : %s" % (msg.content, e.__class__.__name, e)
+                "The redirection of the message '%s' raised a(n) %s : %s" % (msg.content, e.__class__.__name__, e)
             )
             await self.error(to=msg.author, msg=msgs.MESSAGE_HAS_RAISED % msg.content)
 
