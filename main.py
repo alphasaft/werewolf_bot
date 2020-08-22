@@ -40,6 +40,8 @@ async def on_ready():
             logger.debug("Bot currently connected")
         except BaseException as exc:
             logger.error("%s : %s" % (exc.__class__.__name__, str(exc)))
+            if isinstance(exc, (asyncio.CancelledError, KeyboardInterrupt, RuntimeError)):
+                break
 
 @bot.event
 async def on_connect():
