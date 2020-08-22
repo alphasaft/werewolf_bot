@@ -1,5 +1,5 @@
 import discord
-from contextlib import contextmanager
+import sys
 import assets.messages as msgs
 import assets.logger as logger
 
@@ -103,13 +103,22 @@ def assure_assertions():
         raise EnvironmentError("This couldn't be run with option -O, because assertions are needed.")
 
 
-def configure_logger(_logger):
-    """Prepare the logger config. _LOGGER can either be a logger.Logger object, or the logger.py file itself."""
+def configure_logger(_logger, level=None, fmt=None, file=None, filemode=None):
+    """
+    Prepare the logger config. _LOGGER can either be a logger.Logger object, or the logger.py file itself.
+    Default configuration is
+
+    LEVEL: logger.Level.INFO,
+    FMT : logger.DATED_FMT,
+    FILE: ".log",
+    FILEMODE: "a"
+    """
     try:
-        _logger.set_level(logger.Level.INFO)
+        _logger.set_level(level or logger.Level.INFO)
     except NameError:
         pass
-    _logger.set_format(logger.DATED_FMT)
+    _logger.set_format(fmt or logger.DATED_FMT)
+    _logger.set_output(file=file or '.log', filemode=filemode or 'a')
 
 
 def on_channel(channel_name: str, contains: bool = False, warn: bool = False):

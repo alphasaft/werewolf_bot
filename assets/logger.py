@@ -41,7 +41,7 @@ class Logger:
         filemode - if file is specified and a string, the builtin function open will use this filemode to open it
         """
         self._output = None
-        self.set_output(file, filemode)
+        self.set_output(file=file, filemode=filemode)
 
         self._level = level
         self._level_fixed = False
@@ -100,7 +100,7 @@ class Logger:
         """Log MESSAGE with severity 'CRITICAL'"""
         self.log(Level.CRITICAL, message)
 
-    def set_output(self, file, filemode='a'):
+    def set_output(self, *, file, filemode='a'):
         """
         Sets self.output to file. Notice that if FILE is a string, self.output gets the value open(file, filemode)
         instead
