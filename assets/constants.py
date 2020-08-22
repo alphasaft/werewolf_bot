@@ -6,6 +6,7 @@ TOKEN = """No token here. See token.py, and replace it by your own token."""
 
 GUILD = 724226339443572770
 WELCOME_CHANNEL = 726114430093623308
+HOOK_CHANNEL = 746683530637213747  # Default channel where the bot emits a "Bot is available" message every 30 seconds
 EXPEDITIONS_CATEGORY = "EXPEDITIONS"
 BASE_ROLE = "Manant"
 

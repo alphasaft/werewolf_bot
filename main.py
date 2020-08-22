@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-
-
+import asyncio
 import discord
+import datetime
+import time
 
 from bot import GameMaster
 from assets.utils import assure_assertions, configure_logger
@@ -30,6 +31,15 @@ commands.tests_cmd.__implement__(bot)
 @bot.event
 async def on_ready():
     logger.info("Ready as %s with id %s" % (bot.user.name, bot.user.id))
+    while True:
+        try:
+            await asyncio.sleep(3*60)
+            await bot.get_channel(consts.HOOK_CHANNEL).send(
+                "Bot currently connected (%s)" % datetime.datetime.fromtimestamp(time.time())
+            )
+            logger.debug("Bot currently connected")
+        except BaseException as exc:
+            logger.error("%s : %s" % (exc.__class__.__name__, str(exc)))
 
 @bot.event
 async def on_connect():

@@ -1,3 +1,5 @@
+import os
+
 from assets.utils import italic, bold, indented, suppress_markdown, suppress, unpack, configure_logger
 from assets.constants import ALLTIMES_CMDS, PREFIX
 import assets.logger as logger
@@ -122,6 +124,9 @@ class BaseStep:
         else:
             logger.debug("La commande de jeu '%s' vient d'être invoquée avec succès par %s" % (cmd, author.user.name))
 
+    async def where_cmd(self, args, author, roles, dialogs):
+        print(os.getcwd())
+
     async def skip_cmd(self, args, author, roles, dialogs):
         """ `*skip` : Passe cette étape du jeu. À n'utiliser qu'en cas de problèmes."""
         try:
@@ -175,11 +180,12 @@ class BaseStep:
         docs = ['- - - - - - - - - - - - - - - ']
         for attr in dir(self):
             if "cmd" in attr and (suppress(attr, "_cmd", "external_") in ALLTIMES_CMDS or self.is_current_role(author)):
-                doc = getattr(self, attr).__doc__ or '`' + PREFIX + suppress(attr, "_cmd", "external_") + " [args...]`"
-                if hasattr(BaseStep, attr):  # Basic command
-                    docs.insert(0, doc)
-                else:
-                    docs.append(doc)
+                doc = getattr(self, attr).__doc__
+                if doc:
+                    if hasattr(BaseStep, attr):  # Basic command
+                        docs.insert(0, doc)
+                    else:
+                        docs.append(doc)
 
         await author.send(
             embed=msgs.GET_COMMANDS.build(commands=",\n- ".join(doc.strip().replace('*', PREFIX) for doc in docs))
