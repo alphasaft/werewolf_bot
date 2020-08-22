@@ -6,14 +6,14 @@ TOKEN = """No token here. See token.py, and replace it by your own token."""
 
 GUILD = 724226339443572770
 WELCOME_CHANNEL = 726114430093623308
-HOOK_CHANNEL = 746683530637213747  # Default channel where the bot emits a "Bot is available" message every 30 seconds
+HOOK_CHANNEL = 746683530637213747
 EXPEDITIONS_CATEGORY = "EXPEDITIONS"
 BASE_ROLE = "Manant"
 
 
 # Game constants
 
-DIALOGS_PATH = "game/dialogs/story.json"
+DIALOGS_PATH = "data/story.json"
 MINIMUM_PLAYERS = 1
 ALLTIMES_CMDS = ('admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes', 'again', 'kick')
 WHITE_VOTE = "Vote blanc"

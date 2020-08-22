@@ -128,7 +128,6 @@ def configure_logger(_logger, level=None, fmt=None, file=None, filemode=None, te
         _logger.disable_tee()
 
 
-
 def on_channel(channel_name: str, contains: bool = False, warn: bool = False):
     """Decorator. Call the decorated command only if it was invoked on channel CHANNEL_NAME"""
     def decorator(f):

@@ -1,7 +1,7 @@
 import discord
+
 from bot.extended_bot import ExtendedBot
-from game.session import Session
-from game.dialogs import StoryBook
+from game import Session, StoryBook
 from assets.exceptions import *
 from assets.utils import make_mention
 import assets.messages as msgs

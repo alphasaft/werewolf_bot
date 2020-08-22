@@ -36,7 +36,7 @@ class Logger:
         ----------
 
         level - The severity level of the logger
-        fmt - The format for the log ; see self.set_format() for more info
+        fmt - The format for the log ; see Logger.set_format() for more info
         file - a string or an IO object for the logs
         filemode - if file is specified and a string, the builtin function open will use this filemode to open it
         tee - if provided and True, prints every logged info in FILE and in sys.stdout
@@ -138,10 +138,10 @@ class Logger:
         except ValueError:
             raise ValueError("LEVEL parameter must be a Level")
 
-        self._level = level
+        self._level = Level(level)
         self._level_fixed = True
 
-    def enabled_tee(self):
+    def enable_tee(self):
         """Enables the 'tee' option"""
         self._tee = True
 
@@ -164,5 +164,5 @@ critical = _ROOT_LOGGER.critical
 set_output = _ROOT_LOGGER.set_output
 set_format = _ROOT_LOGGER.set_format
 set_level = _ROOT_LOGGER.set_level
-enabled_tee = _ROOT_LOGGER.enabled_tee
+enable_tee = _ROOT_LOGGER.enable_tee
 disable_tee = _ROOT_LOGGER.disable_tee
