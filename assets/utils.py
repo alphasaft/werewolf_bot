@@ -105,7 +105,10 @@ def assure_assertions():
 
 def configure_logger(_logger):
     """Prepare the logger config. _LOGGER can either be a logger.Logger object, or the logger module itself."""
-    _logger.set_level(logger.Level.WARNING)
+    try:
+        _logger.set_level(logger.Level.WARNING)
+    except NameError:
+        pass
     _logger.set_format(logger.DATED_FMT)
 
 

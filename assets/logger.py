@@ -79,7 +79,7 @@ class Logger:
             # We force the message to be written instantly
             print(_fmt, file=self._output)
             self._output.flush()
-            os.fsync(self._output.fileno())
+            os.sync()
 
     def debug(self, message: str):
         """Log MESSAGE with severity 'DEBUG'"""
