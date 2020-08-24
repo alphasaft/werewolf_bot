@@ -153,6 +153,9 @@ class GameMaster(ExtendedBot):
     def add_event_member(self, name, member):
         self.events[name].add_member(member)
 
+    def confirm_presence(self, name, user_id):
+        self.events[name].confirm_presence(user_id)
+
     async def activate_events(self):
         for name, event in self.events.copy().items():
             await event.check_and_activate(bot=self)

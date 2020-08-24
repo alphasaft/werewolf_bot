@@ -74,3 +74,15 @@ def __implement__(bot: GameMaster):
 
         bot.add_event_member(name, ctx.author)
         await ctx.channel.send(msgs.EVENT_SUCCESSFULLY_SUBSCRIBED % name)
+
+    @calendar.command()
+    async def present(ctx, name=None):
+        try:
+            bot.check_parameter(name, "$calendar present NomDeLEvenement", "NomDeLEvenement")
+            bot.check_event_exists(name)
+            bot.confirm_presence(name, ctx.author.id)
+        except Exception as e:
+            await ctx.channel.send(e)
+            return
+
+        await ctx.channel.send(":white_check_mark: Votre présence a bien été confirmée pour l'événement %s !" % name)

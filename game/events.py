@@ -3,10 +3,10 @@
 import discord
 import datetime
 import time
-import pickle
 import re
 
 from assets.constants import TIMEZONE
+from assets.exceptions import *
 
 
 # Functions
@@ -92,9 +92,8 @@ def is_over(when: str):
 # Core
 # - - - - - - - - -
 
-class _Remainder(object):
-    def __init__(self, event_dt: datetime.datetime, dt: datetime.datetime, description):
-        self._event_dt = event_dt
+class _BaseEvent(object):
+    def __init__(self, dt: datetime.datetime, description):
         self.dt = dt
 
         self.year = dt.year
@@ -107,25 +106,11 @@ class _Remainder(object):
 
     @property
     def description(self):
-        if isinstance(self, Event):
-            # We return the raw description
-            return self._description
-
-        date = self._event_dt
-        _now = now()
-
-        return self._description.format(
-            when="le %02i/%02i à %02i:%02i" % (date.day, date.month, date.hour, date.minute),
-            now="le %02i/%02i à %02i:%02i" % (_now.day, _now.month, _now.hour, _now.minute),
-            date="%02i/%02i" % (date.month, date.day),
-            time="%02i:%02i" % (date.hour, date.minute),
-            now_date="%02i/%02i" % (_now.month, _now.day),
-            now_time="%02i:%02i" % (_now.hour, _now.minute)
-        )
+        return self._description
 
     def __eq__(self, other):
         return any((
-            isinstance(other, _Remainder) and other.dt == self.dt,
+            isinstance(other, _BaseEvent) and other.dt == self.dt,
             isinstance(other, datetime.datetime) and other == self.dt
         ))
 
@@ -143,13 +128,32 @@ class _Remainder(object):
         ))
 
     def over(self):
-        """Return True if self belongs to the past, else False"""
         if now() >= self.dt:
             return True
         return False
 
 
-class Event(_Remainder):
+class Remainder(_BaseEvent):
+    def __init__(self, event_dt: datetime.datetime, dt: datetime.datetime, description):
+        self._event_dt = event_dt
+        _BaseEvent.__init__(self, dt, description)
+
+    @property
+    def description(self):
+        date = self._event_dt
+        _now = now()
+
+        return self._description.format(
+            when="le %02i/%02i à %02i:%02i" % (date.day, date.month, date.hour, date.minute),
+            now="le %02i/%02i à %02i:%02i" % (_now.day, _now.month, _now.hour, _now.minute),
+            date="%02i/%02i" % (date.month, date.day),
+            time="%02i:%02i" % (date.hour, date.minute),
+            now_date="%02i/%02i" % (_now.month, _now.day),
+            now_time="%02i:%02i" % (_now.hour, _now.minute)
+        )
+
+
+class Event(_BaseEvent):
     """Represents an Event that has a date, a time and a description, and that owns several remainders"""
 
     def __init__(self,
@@ -161,15 +165,15 @@ class Event(_Remainder):
                  remainder_desc=None,
                  ):
 
-        _when = convert_to_datetime(when)
-        _Remainder.__init__(self, _when, _when, description)
+        _BaseEvent.__init__(self, convert_to_datetime(when), description)
 
         self.admin = admin
         self.members = {admin.id: admin}
+        self.present_members = set()
 
         self._remainder_desc = remainder_desc
         self._bef_remainders = self._get_remainders(self.timestamp(), -1, bef_remainders[0], bef_remainders[1])
-        # self._aft_remainders = self._get_remainders(self.timestamp(), 1, aft_remainders[0], aft_remainders[1])
+        self._aft_remainders = self._get_remainders(self.timestamp(), 1, aft_remainders[0], aft_remainders[1])
 
     def __repr__(self):
         return "<Event (%s) on %s/%s, %s:%s>" % (self.description, self.day, self.month, self.hour, self.minute)
@@ -177,7 +181,7 @@ class Event(_Remainder):
     @property
     def _remainders(self):
         """Returns self._bef_remainders + self._aft_remainders"""
-        return self._bef_remainders  # + self._aft_remainders
+        return self._bef_remainders + self._aft_remainders
 
     def _get_remainders(self, initial_stamp: float, rel: int, count: int, delay: int):
         """
@@ -189,21 +193,45 @@ class Event(_Remainder):
         for i in range(count):
             date = datetime.datetime.utcfromtimestamp(initial_stamp + (delay * (i+1) * rel))
             desc = self._remainder_desc or "Rappel : %s" % self.description
-            remainders.append(_Remainder(self.dt, date, desc))
+            remainders.append(Remainder(self.dt, date, desc))
 
         return remainders
 
     def add_member(self, member):
+        """Add a member to the event"""
         self.members[member.id] = member
+
+    def confirm_presence(self, user_id):
+        """
+        Confirm that the user is present for the event.
+        It raises a BelongingError if the user doesn't belong to this event or an EventRelatedError in the case the
+        event hasn't yet begin
+        """
+        if user_id not in self.members:
+            raise BelongingError("Vous n'appartenez pas à cet événement !")
+
+        if user_id in self.present_members:
+            raise EventRelatedError("Vous avez déjà confirmé pour cette événement !")
+
+        if now() < self.dt:
+            raise EventRelatedError("L'événement n'a pas encore commencé !")
+
+        self.present_members.add(user_id)
 
     async def check_and_activate(self, bot):
         """
         Checks if the event (or one of the remainders) corresponds to the current date and time and notify all members
         with its description if yes. In case it's the event that corresponds, it calls self.activate() too.
         """
-        for remainder in self._remainders:
+        for remainder in self._bef_remainders:
             if remainder.on_now():
                 await self.notify(remainder.description)
+
+        for remainder in self._aft_remainders:
+            if remainder.on_now():
+                for _id, member in self.members.items():
+                    if _id not in self.present_members:
+                        await member.send(remainder.description)
 
         if self.on_now():
             await self.activate(bot=bot)
@@ -218,10 +246,15 @@ class Event(_Remainder):
             await member.send(msg)
 
     def over(self):
-        """Return True if the event is over (the latest _Remainder was done), False otherwise"""
-        if now() >= self.dt:  # self._aft_remainders[-1].dt:
+        """Return True if the event is over (the latest Remainder was done), False otherwise"""
+        if not self._aft_remainders and now() >= self.dt:
             return True
-        return False
+
+        elif self._aft_remainders and now() >= self._aft_remainders[-1].dt:
+            return True
+
+        else:
+            return False
 
 
 # Specific events
