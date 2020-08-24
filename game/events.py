@@ -93,7 +93,8 @@ def is_over(when: str):
 # - - - - - - - - -
 
 class _Remainder(object):
-    def __init__(self, dt: datetime.datetime, description):
+    def __init__(self, event_dt: datetime.datetime, dt: datetime.datetime, description):
+        self._event_dt = event_dt
         self.dt = dt
 
         self.year = dt.year
@@ -102,7 +103,25 @@ class _Remainder(object):
         self.hour = dt.hour
         self.minute = dt.minute
 
-        self.description = description
+        self._description = description
+
+    @property
+    def description(self):
+        if isinstance(self, Event):
+            # We return the raw description
+            return self._description
+
+        date = self._event_dt
+        _now = now()
+
+        return self._description.format(
+            when="le %02i/%02i à %02i:%02i" % (date.day, date.month, date.hour, date.minute),
+            now="le %02i/%02i à %02i:%02i" % (_now.day, _now.month, _now.hour, _now.minute),
+            date="%02i/%02i" % (date.month, date.day),
+            time="%02i:%02i" % (date.hour, date.minute),
+            now_date="%02i/%02i" % (_now.month, _now.day),
+            now_time="%02i:%02i" % (_now.hour, _now.minute)
+        )
 
     def __eq__(self, other):
         return any((
@@ -142,7 +161,8 @@ class Event(_Remainder):
                  remainder_desc=None,
                  ):
 
-        _Remainder.__init__(self, convert_to_datetime(when), description)
+        _when = convert_to_datetime(when)
+        _Remainder.__init__(self, _when, _when, description)
 
         self.admin = admin
         self.members = {admin.id: admin}
@@ -165,22 +185,11 @@ class Event(_Remainder):
         seconds
         """
         remainders = []
+        _now = now()
         for i in range(count):
             date = datetime.datetime.utcfromtimestamp(initial_stamp + (delay * (i+1) * rel))
-            _now = now()
-            if self._remainder_desc:
-                desc = self._remainder_desc.format(
-                    when="le %02i/%02i à %02i:%02i" % (date.day, date.month, date.hour, date.minute),
-                    now="le %02i/%02i à %02i:%02i" % (_now.day, _now.month, _now.hour, _now.minute),
-                    date="%02i/%02i" % (date.month, date.day),
-                    time="%02i:%02i" % (date.hour, date.minute),
-                    now_date="%02i/%02i" % (_now.month, _now.day),
-                    now_time="%02i:%02i" % (_now.hour, _now.minute)
-                )
-            else:
-                desc = "Rappel : %s" % self.description
-
-            remainders.append(_Remainder(date, desc))
+            desc = self._remainder_desc or "Rappel : %s" % self.description
+            remainders.append(_Remainder(self.dt, date, desc))
 
         return remainders
 
@@ -222,9 +231,10 @@ class GameEvent(Event):
     def __init__(self, when, name, admin, home_channel):
         self.home_channel = home_channel
 
+        smiley = ":stuck_out_tongue_closed_eyes:"
         desc = "La partie %s va commencer ! Viens vite !"
-        remainder_desc = "Rappel : La partie %s est programmé pour {when}, et nous sommes {now}, ne l'oublie pas !"
-        Event.__init__(self, when, desc % name, admin=admin, remainder_desc=remainder_desc % name)
+        remainder_desc = "Rappel : La partie %s est programmée pour {when}, et nous sommes {now}, ne l'oublie pas %s"
+        Event.__init__(self, when, desc % name, admin=admin, remainder_desc=remainder_desc % (name, smiley))
 
     async def activate(self, bot):
         ...
