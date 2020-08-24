@@ -55,7 +55,7 @@ def __implement__(bot: GameMaster):
             bot.check_parameter(game_name, "game join unePartie", "unePartie")
             bot.check_game_exists(game_name)
             bot.check_is_alone(ctx.author.id)
-            bot.check_is_joignable(game_name)
+            bot.check_is_available(game_name)
         except Exception as e:
             await ctx.channel.send(e)
             return
