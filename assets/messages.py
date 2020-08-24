@@ -79,9 +79,6 @@ ALREADY_WAITING = """
 Erreur :  Déjà en attente d'une confirmation pour la commande %s
 """
 
-
-# --- Others ---
-
 WELCOME = """
 Bienvenue à %s dans notre charmant village ! Combien de temps vas-tu tenir ?
 N'oublie pas de lire les règles à la Mairie !
@@ -95,8 +92,8 @@ SUCCESSFULLY_CREATED = """
 Utilisez `$game join %s` pour la rejoindre !
 """
 
-FAILED_GAME_CREATION = """
-Erreur lors de la création de la partie %s : %s
+NAME_ALREADY_TAKEN = """
+Le nom %s est déjà pris par un evenement ou une partie !
 """
 
 # --- game join ---
@@ -105,11 +102,11 @@ SUCCESSFULLY_JOINED = """
 Vous avez rejoint la partie %s avec succès ! :partying_face:
 """
 
-FAILED_JOIN = """
+HAS_ALREADY_JOINED = """
 Vous ne pouvez pas rejoindre cette partie : vous appartenez déjà à celle %s :weary:
 """
 
-NOT_JOIGNABLE = """
+GAME_NOT_AVAILABLE = """
 La partie %s ne peut pas être jointe, car elle est en cours :cry:
 """
 
@@ -191,6 +188,31 @@ GAME_START = _EmbedSkeleton(
     content="- {members}",
     footer="Souhaitez-leur bonne chance !"
 )
+
+
+# --- calendar add ---
+
+NO_FREE_TIME = """
+Vous avez déjà un événement sur votre calendrier pour cette date ('%s')
+"""
+
+BAD_EVENT_TYPE = """
+"%s" n'est pas un type d'événement valide
+"""
+
+EVENT_SUCCESSFULLY_CREATED = """
+:white_check_mark: L'événement %s a été ajouté avec succès à cette heure !
+"""
+
+NEW_EVENT = """
+:trumpet: L'événement %s de type %s vient d'être créé par %s pour cette date/heure : %s. Inscrivez vous vite !
+"""
+
+# --- calendar subscribe ---
+
+EVENT_SUCCESSFULLY_SUBSCRIBED = """
+:grin: Vous avez bien rejoint l'événement %s !
+"""
 
 
 # --- kick ---

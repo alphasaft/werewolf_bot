@@ -21,7 +21,6 @@ class Level(enum.Enum):
 
 
 # Base formats
-
 CLASSIC_FMT = "{level} : {message}"
 MESSAGE_FMT = "{message}"
 DATED_FMT = "{level} : At {datetime} : {message}"

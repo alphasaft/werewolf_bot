@@ -11,7 +11,6 @@ BRIEF = """Crée, supprime et gère vos parties."""
 
 FULL = """
 Crée, supprime et gère vos parties.
-Pas d'autorisations nécessaires pour utiliser cette commande.
 
 game new nomDeLaPartie -> crée une partie ; vous êtes son admin
 game join unePartie -> Rejoint cette partie
@@ -38,7 +37,7 @@ def __implement__(bot: GameMaster):
     async def new(ctx, game_name=None, *too):
         try:
             bot.check_parameter(game_name, "game new nomDeLaPartie", "nomDeLaPartie")
-            bot.check_game_doesnt_exist(game_name)
+            bot.check_name_is_available(game_name)
             bot.check_is_alone(ctx.author.id)
             bot.check_not_too_much_parameters(too, "game new nomDeLaPartie")
         except Exception as e:
@@ -56,7 +55,7 @@ def __implement__(bot: GameMaster):
             bot.check_parameter(game_name, "game join unePartie", "unePartie")
             bot.check_game_exists(game_name)
             bot.check_is_alone(ctx.author.id)
-            bot.check_can_join(game_name)
+            bot.check_is_joignable(game_name)
         except Exception as e:
             await ctx.channel.send(e)
             return

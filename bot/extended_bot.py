@@ -1,5 +1,5 @@
 from discord.ext.commands import Bot
-from assets.exceptions import MissingParameterError
+from assets.exceptions import CommandSyntaxError, AvailabilityError
 from assets.constants import PREFIX
 from .devtools import DevTool, DevCommandNotFound, TransformationError, __implement_dev_commands__
 import assets.messages as msgs
@@ -99,16 +99,16 @@ class ExtendedBot(Bot):
         """Checks that self isn't waiting for a confirmation from USER, else raises a RuntimeError"""
         already_waiting = self._waiting_for_confirmations.get(user)
         if already_waiting:
-            raise RuntimeError(msgs.ALREADY_WAITING % already_waiting)
+            raise AvailabilityError(msgs.ALREADY_WAITING % already_waiting)
 
     @staticmethod
     def check_parameter(parameter, syntax, parameter_name):
         """Checks that parameter is not None, else raises MissingParameterError(ERR_MSG)"""
         if parameter is None:
-            raise MissingParameterError(msgs.MISSING_PARAMETER % (syntax, parameter_name))
+            raise CommandSyntaxError(msgs.MISSING_PARAMETER % (syntax, parameter_name))
 
     @staticmethod
     def check_not_too_much_parameters(too_much, expected_syntax):
         """Checks that too_much is empty or None, else raises a ValueError."""
         if too_much:
-            raise ValueError(msgs.TOO_MUCH_PARAMETERS % expected_syntax, "', '".join(too_much))
+            raise CommandSyntaxError(msgs.TOO_MUCH_PARAMETERS % expected_syntax, "', '".join(too_much))

@@ -10,7 +10,7 @@ from .hunter import Hunter
 from .lovemaker import LoveMaker
 
 from .rolegroup import RoleGroup
-from assets.exceptions import NotAnAdminError
+from assets.exceptions import CommandPermissionError
 import assets.messages as msgs
 
 
@@ -82,7 +82,7 @@ class Roles(dict):
 
     def check_is_admin(self, player):
         if not player.user == self.admin:
-            raise NotAnAdminError(msgs.MISSING_PERMISSIONS % ('admin', self.game_name))
+            raise CommandPermissionError(msgs.MISSING_PERMISSIONS % ('admin', self.game_name))
 
     def has_role(self, role):
         for player in self.players():

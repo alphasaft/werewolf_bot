@@ -6,16 +6,19 @@ TOKEN = """No token here. See token.py, and replace it by your own token."""
 
 GUILD = 724226339443572770
 WELCOME_CHANNEL = 726114430093623308
+EVENTS_CHANNEL = 744228828867723476
 EXPEDITIONS_CATEGORY = "EXPEDITIONS"
 BASE_ROLE = "Manant"
 
-HOOK_CHANNEL = 746683530637213747
-HOOK_DELAY = 3600
+_TIMEZONE = 2  # Your time zone here. 2 is UTC+2, -3 UTC-3, etc
+TIMEZONE = _TIMEZONE * 3600
+
 
 # Game constants
 
 DIALOGS_PATH = "data/story.json"
-MINIMUM_PLAYERS = 1
+BOT_STATE_PATH = "data/bot_state.bin"
+MINIMUM_PLAYERS = 4
 ALLTIMES_CMDS = ('admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes', 'again', 'kick')
 WHITE_VOTE = "Vote blanc"
 

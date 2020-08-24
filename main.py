@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import discord
-import datetime
-import time
 
 from bot import GameMaster
 from assets.utils import assure_assertions, configure_logger
@@ -19,8 +17,15 @@ assure_assertions()
 configure_logger(logger)
 
 # Implementing commands
-bot = GameMaster(command_prefix=consts.PREFIX, description=consts.DESCRIPTION, case_insensitive=True)
+kwargs = {'command_prefix': consts.PREFIX, 'description': consts.DESCRIPTION, 'case_insensitive': True}
+try:
+    bot = GameMaster.from_binary_file(consts.BOT_STATE_PATH, **kwargs)
+except (FileNotFoundError, ValueError, EOFError):
+    bot = GameMaster(**kwargs)
+
+
 commands.game_cmd.__implement__(bot)
+commands.calendar_cmd.__implement__(bot)
 commands.clear_cmd.__implement__(bot)
 commands.kick_cmd.__implement__(bot)
 commands.embed_cmd.__implement__(bot)
@@ -33,15 +38,13 @@ async def on_ready():
     logger.info("Ready as %s with id %s" % (bot.user.name, bot.user.id))
     while True:
         try:
-            await asyncio.sleep(consts.HOOK_DELAY)
-            await bot.get_channel(consts.HOOK_CHANNEL).send(
-                "Bot currently connected (%s)" % datetime.datetime.fromtimestamp(time.time())
-            )
-            logger.debug("Bot currently connected")
-        except BaseException as exc:
-            logger.error("%s : %s" % (exc.__class__.__name__, str(exc)))
-            if isinstance(exc, (asyncio.CancelledError, KeyboardInterrupt, RuntimeError)):
-                break
+            await asyncio.sleep(1*60)
+            await bot.activate_events()
+        except Exception as e:
+            logger.error("%s : %s" % (e.__class__.__name__, e))
+            if isinstance(e, (asyncio.CancelledError, KeyboardInterrupt)):
+                exit(137)
+
 
 @bot.event
 async def on_connect():
@@ -89,6 +92,16 @@ async def on_member_join(member):
         await member.add_roles(discord.utils.get(roles, name=consts.BASE_ROLE), reason="Role de base du village")
 
 
+def finish_process(n):
+    """Ends the process with exit code N"""
+    # Recording the project state
+    bot.dialogs.save(consts.DIALOGS_PATH)
+    bot.dump(consts.BOT_STATE_PATH)
+
+    logger.info("Process ended")
+    exit(n)
+
+
 if __name__ == '__main__':
     try:
         logger.info("Process started")
@@ -97,8 +110,6 @@ if __name__ == '__main__':
         bot.run(token.TOKEN)
     except BaseException as e:
         logger.critical("Killed by %s : %s" % (e.__class__.__name__, e))
-    finally:
-        # Recording the dialogs
-        bot.dialogs.save(consts.DIALOGS_PATH)
-
-        logger.info("Process ended")
+        finish_process(1)
+    else:
+        finish_process(0)

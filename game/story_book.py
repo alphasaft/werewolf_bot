@@ -14,7 +14,10 @@ class StoryBook(dict):
 
     def __getattr__(self, item):
         """Return self[item]"""
-        return self[item]
+        if not item.startswith('_'):
+            return self[item]
+        else:
+            return object.__getattribute__(self, item)
 
     def __str__(self):
         return str(self.as_json())
@@ -63,7 +66,10 @@ class _StoryChapter(dict):
 
     def __getattr__(self, item):
         """Returns self[item]"""
-        return self[item]
+        if not item.startswith('_'):
+            return self[item]
+        else:
+            return object.__getattribute__(self, item)
 
 
 class _StoryPage(list):
