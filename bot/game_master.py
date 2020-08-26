@@ -41,8 +41,6 @@ class _XmlEventsIO(object):
         root = etree.Element("events")
 
         for name, event in self.events.items():
-            event: Event
-
             # Event root node
             event_node = etree.SubElement(root, "event")
 
@@ -69,9 +67,10 @@ class _XmlEventsIO(object):
             # Remainders
             remainders = etree.SubElement(event_node, "remainders")
             for remainder in event.remainders:
-                etree.SubElement(remainders, "elem").text = str(remainder.time_from_event)
+                etree.SubElement(remainders, "elem").text = str(int(remainder.time_from_event))
 
-        file.write(etree.tostring(root, pretty_print=True).decode("utf-8"))
+        with open(file, 'w') as f:
+            f.write(etree.tostring(root, pretty_print=True).decode("utf-8"))
 
     @classmethod
     def load(cls, file: str, bot):
@@ -95,7 +94,7 @@ class _XmlEventsIO(object):
             remainders = []
             remainders_node = event.find("remainders")
             for elem in remainders_node.findall("elem"):
-                remainders.append(float(elem.text))
+                remainders.append(int(elem.text))
 
             if event.get("type") == "game":
                 date = cls._load_date(event.find("date"))
