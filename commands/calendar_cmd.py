@@ -173,7 +173,7 @@ def __implement__(bot: GameMaster):
             return
 
         await ctx.channel.send(embed=msgs.GET_EVENT_MEMBERS.build(
-            members=",\n- ".join(bot.get_event_members(name)),
+            members=",\n- ".join(m.display_name for m in bot.get_event_members(name)),
             name=name
         ))
 

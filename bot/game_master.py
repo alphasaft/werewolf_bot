@@ -232,7 +232,7 @@ class GameMaster(ExtendedBot):
         return self.games[name].get_players()
 
     def get_event_members(self, name: str):
-        return self.games[name].get_members()
+        return self.events[name].get_members()
 
     # - - - Game - - -
     def add_game(self, name, admin, home_channel):

@@ -7,12 +7,12 @@
       <member id="709029574863749160" admin="True"/>
     </members>
     <remainders>
-      <elem>-60</elem>
-      <elem>-30</elem>
-      <elem>-5</elem>
-      <elem>5</elem>
-      <elem>10</elem>
-      <elem>15</elem>
+      <elem>-180</elem>
+      <elem>-150</elem>
+      <elem>-125</elem>
+      <elem>-115</elem>
+      <elem>-110</elem>
+      <elem>-105</elem>
     </remainders>
   </event>
 </events>
