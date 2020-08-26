@@ -1,4 +1,4 @@
-"""Defines a class representing a calendar, that can manage events"""
+"""Contains the event stuff of the bot"""
 
 import discord
 import datetime
@@ -130,7 +130,7 @@ class _BaseEvent(object):
         ))
 
     def timestamp(self):
-        return self.dt.timestamp() + TIMEZONE
+        return self.dt.timestamp()
 
     def on_now(self):
         _now = now()
@@ -149,13 +149,13 @@ class _BaseEvent(object):
 
 
 class Remainder(_BaseEvent):
-    def __init__(self, event_dt: datetime.datetime, dt: datetime.datetime, description):
-        self._event_dt = event_dt
+    def __init__(self, event, dt: datetime.datetime, description):
+        self._event = event
         _BaseEvent.__init__(self, dt, description)
 
     @property
     def description(self):
-        date = self._event_dt
+        date = self._event.dt
         _now = now()
 
         return self.raw_description.format(
@@ -169,8 +169,8 @@ class Remainder(_BaseEvent):
 
     @property
     def time_from_event(self):
-        """Returns the time that separates the event from the remainders, in minutes"""
-        return round((self.dt.timestamp() - self._event_dt.timestamp())/60)
+        """Returns the time that separates the event from the remainder, in minutes"""
+        return round((self.timestamp() - self._event.timestamp())/60)
 
 
 class Event(_BaseEvent):
@@ -198,7 +198,7 @@ class Event(_BaseEvent):
         self.aft_remainders = self._get_remainders(self.timestamp(), (r for r in _remainders if r > 0))
 
     def __repr__(self):
-        return "<Event (%s) on %s/%s, %s:%s>" % (self.description, self.day, self.month, self.hour, self.minute)
+        return "<Event '%s' on %02i/%02i, %02i:%02i>" % (self.description, self.day, self.month, self.hour, self.minute)
 
     @property
     def remainders(self):
@@ -215,7 +215,7 @@ class Event(_BaseEvent):
                 desc = self.bef_remainder_desc or "Rappel : %s" % self.description
             else:
                 desc = self.aft_remainder_desc or "On t'attend : %s" % self.description
-            remainders.append(Remainder(self.dt, date, desc))
+            remainders.append(Remainder(self, date, desc))
 
         return remainders
 

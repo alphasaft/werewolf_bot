@@ -67,7 +67,7 @@ class _XmlEventsIO(object):
             # Remainders
             remainders = etree.SubElement(event_node, "remainders")
             for remainder in event.remainders:
-                etree.SubElement(remainders, "elem").text = str(int(remainder.time_from_event))
+                etree.SubElement(remainders, "elem").text = str(remainder.time_from_event)
 
         with open(file, 'w') as f:
             f.write(etree.tostring(root, pretty_print=True).decode("utf-8"))
