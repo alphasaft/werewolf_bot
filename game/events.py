@@ -24,7 +24,7 @@ _DATETIME_REGEX = re.compile("(%s/%s,|today\+%s,)?%s:%s" % (
     _named_regex_group("day", "[0-3][0-9]"),
     _named_regex_group("month", "(0[1-9]|1[0-2])"),
     _named_regex_group("forward", "([1-9]|10)"),
-    _named_regex_group("hour", "[0-2][0-9]"),
+    _named_regex_group("hour", "[0-2]?[0-9]"),
     _named_regex_group("minute", "[0-5][0-9]")
 ))
 
@@ -84,6 +84,11 @@ def convert_to_datetime(s: str):
     return dt
 
 
+def convert_to_str(dt: datetime.datetime):
+    ret = "%02i/%02i,%02i:%02i" % (dt.day, dt.month, dt.hour, dt.minute)
+    return ret
+
+
 def is_over(when: str):
     """Returns True if the described date and time belong to the past else False"""
     return now() > convert_to_datetime(when)
@@ -102,11 +107,11 @@ class _BaseEvent(object):
         self.hour = dt.hour
         self.minute = dt.minute
 
-        self._description = description
+        self.raw_description = description
 
     @property
     def description(self):
-        return self._description
+        return self.raw_description
 
     def __eq__(self, other):
         return any((
@@ -143,7 +148,7 @@ class Remainder(_BaseEvent):
         date = self._event_dt
         _now = now()
 
-        return self._description.format(
+        return self.raw_description.format(
             when="le %02i/%02i à %02i:%02i" % (date.day, date.month, date.hour, date.minute),
             now="le %02i/%02i à %02i:%02i" % (_now.day, _now.month, _now.hour, _now.minute),
             date="%02i/%02i" % (date.month, date.day),
@@ -151,6 +156,10 @@ class Remainder(_BaseEvent):
             now_date="%02i/%02i" % (_now.month, _now.day),
             now_time="%02i:%02i" % (_now.hour, _now.minute)
         )
+
+    @property
+    def time_from_event(self):
+        return self.dt.timestamp() - self._event_dt.timestamp()
 
 
 class Event(_BaseEvent):
@@ -160,9 +169,9 @@ class Event(_BaseEvent):
                  when: str,
                  description: str,
                  admin: discord.User,
-                 bef_remainders=(2, 1800),
-                 aft_remainders=(2, 300),
-                 remainder_desc=None,
+                 bef_remainder_desc=None,
+                 aft_remainder_desc=None,
+                 _remainders=None
                  ):
 
         _BaseEvent.__init__(self, convert_to_datetime(when), description)
@@ -171,28 +180,30 @@ class Event(_BaseEvent):
         self.members = {admin.id: admin}
         self.present_members = set()
 
-        self._remainder_desc = remainder_desc
-        self._bef_remainders = self._get_remainders(self.timestamp(), -1, bef_remainders[0], bef_remainders[1])
-        self._aft_remainders = self._get_remainders(self.timestamp(), 1, aft_remainders[0], aft_remainders[1])
+        _remainders = _remainders or (-60, -30, -5, 5, 10, 15)
+        self.bef_remainder_desc = bef_remainder_desc
+        self.aft_remainder_desc = aft_remainder_desc
+        self.bef_remainders = self._get_remainders(self.timestamp(), (r for r in _remainders if r < 0))
+        self.aft_remainders = self._get_remainders(self.timestamp(), (r for r in _remainders if r > 0))
 
     def __repr__(self):
         return "<Event (%s) on %s/%s, %s:%s>" % (self.description, self.day, self.month, self.hour, self.minute)
 
     @property
-    def _remainders(self):
-        """Returns self._bef_remainders + self._aft_remainders"""
-        return self._bef_remainders + self._aft_remainders
+    def remainders(self):
+        """Returns self.bef_remainders + self.aft_remainders"""
+        return self.bef_remainders + self.aft_remainders
 
-    def _get_remainders(self, initial_stamp: float, rel: int, count: int, delay: int):
-        """
-        Returns a list of COUNT _Remainder object(s), before (REL=-1) or after (REL=1) the INITIAL_DT, spaced from DELAY
-        seconds
-        """
+    def _get_remainders(self, initial_stamp, _list):
+        """Returns a list of COUNT Remainder object(s)"""
         remainders = []
         _now = now()
-        for i in range(count):
-            date = datetime.datetime.utcfromtimestamp(initial_stamp + (delay * (i+1) * rel))
-            desc = self._remainder_desc or "Rappel : %s" % self.description
+        for remainder in _list:
+            date = datetime.datetime.utcfromtimestamp(initial_stamp + remainder)
+            if remainder < 0:
+                desc = self.bef_remainder_desc or "Rappel : %s" % self.description
+            else:
+                desc = self.aft_remainder_desc or "On t'attend : %s" % self.description
             remainders.append(Remainder(self.dt, date, desc))
 
         return remainders
@@ -223,11 +234,11 @@ class Event(_BaseEvent):
         Checks if the event (or one of the remainders) corresponds to the current date and time and notify all members
         with its description if yes. In case it's the event that corresponds, it calls self.activate() too.
         """
-        for remainder in self._bef_remainders:
+        for remainder in self.bef_remainders:
             if remainder.on_now():
                 await self.notify(remainder.description)
 
-        for remainder in self._aft_remainders:
+        for remainder in self.aft_remainders:
             if remainder.on_now():
                 for _id, member in self.members.items():
                     if _id not in self.present_members:
@@ -247,10 +258,10 @@ class Event(_BaseEvent):
 
     def over(self):
         """Return True if the event is over (the latest Remainder was done), False otherwise"""
-        if not self._aft_remainders and now() >= self.dt:
+        if not self.aft_remainders and now() >= self.dt:
             return True
 
-        elif self._aft_remainders and now() >= self._aft_remainders[-1].dt:
+        elif self.aft_remainders and now() >= self.aft_remainders[-1].dt:
             return True
 
         else:
@@ -261,16 +272,31 @@ class Event(_BaseEvent):
 # - - - - - - - - -
 
 class GameEvent(Event):
-    def __init__(self, when, name, admin, home_channel):
-        self.home_channel = home_channel
+    def __init__(self,
+                 when,
+                 name,
+                 admin,
+                 home_channel,
+                 _remainders=None,
+                 ):
 
+        self.home_channel = home_channel
         smiley = ":stuck_out_tongue_closed_eyes:"
         desc = "La partie %s va commencer ! Viens vite !"
-        remainder_desc = "Rappel : La partie %s est programmée pour {when}, et nous sommes {now}, ne l'oublie pas %s"
-        Event.__init__(self, when, desc % name, admin=admin, remainder_desc=remainder_desc % (name, smiley))
+        bef_remainder_desc, aft_remainder_desc = (
+            "Rappel : La partie %s est programmée pour {when}, et nous sommes {now}, ne l'oublie pas %s",
+            "La partie %s a déjà commencé ! Viens vite, où ça va commencer sans toi %s"
+        )
+
+        Event.__init__(
+            self,
+            when,
+            desc % name,
+            admin=admin,
+            _remainders=_remainders,
+            bef_remainder_desc=bef_remainder_desc % (name, smiley),
+            aft_remainder_desc=aft_remainder_desc % (name, smiley)
+        )
 
     async def activate(self, bot):
         ...
-
-
-

@@ -37,7 +37,7 @@ class WereWolfsStep(BaseStep):
 
     async def send(self, msg, roles):
         if roles.get_role_by_id(msg.author.id).role == WEREWOLF:
-            to = roles.were_wolfs
+            to = roles.were_wolfs.exclude(msg.author.id)
         else:
             to = roles.everyone.exclude(msg.author.id)
 

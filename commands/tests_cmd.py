@@ -5,12 +5,11 @@ from discord.utils import get
 
 PURGE_EXP_HELP = """Supprime tous les channels EXPEDITIONS"""
 ERASE_TEST_HELP = """Supprime les traces du dernier test"""
+DISCONNECT_HELP = """Déconnecte le bot"""
 
 
 def __implement__(bot):
-    """
-    Implement the command 'purgeexpeditions' and 'erasetest' in the bot. Unable to use that command if not implemented
-    """
+    """Implement some tests commands in the bot. Unable to use those commands if not implemented"""
 
     @bot.command(name='purgeexpeditions', help=PURGE_EXP_HELP)
     @has_permissions(administrator=True)
@@ -29,3 +28,9 @@ def __implement__(bot):
                 break
             else:
                 await message.delete()
+
+    @bot.command(name='disconnect', help=DISCONNECT_HELP)
+    @has_permissions(administrator=True)
+    async def disconnect(ctx):
+        await ctx.channel.send("Disconnecting...")
+        exit(0)

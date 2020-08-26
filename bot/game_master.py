@@ -1,18 +1,117 @@
 import discord
-import pickle
+from lxml import etree
 import datetime
 
 from .extended_bot import ExtendedBot
-from game import Session, StoryBook, GameEvent, convert_to_datetime
+from game import Session, StoryBook, Event, GameEvent, convert_to_datetime, convert_to_str
 from assets.exceptions import *
 from assets.utils import make_mention
 import assets.messages as msgs
 import assets.constants as consts
 
 
-class _BotState(object):
-    def __init__(self, bot):
-        self.games, self.events = bot.games, bot.events
+class _XmlEventsIO(object):
+    def __init__(self, events):
+        self.events = events
+
+    @staticmethod
+    def _dump_date(node, dated_object):
+        set = node.set
+        set("year", str(dated_object.year))
+        set("month", str(dated_object.month))
+        set("day", str(dated_object.day))
+        set("hour", str(dated_object.hour))
+        set("minute", str(dated_object.minute))
+
+    @staticmethod
+    def _load_date(node):
+        def get(s):
+            return int(node.get(s))
+
+        return datetime.datetime(
+            year=get('year'),
+            month=get('month'),
+            day=get('day'),
+            hour=get('hour'),
+            minute=get('minute')
+        )
+
+    def dump(self, file: str):
+        """Dumps the events into the provided xml FILE"""
+        root = etree.Element("events")
+
+        for name, event in self.events.items():
+            event: Event
+
+            # Event root node
+            event_node = etree.SubElement(root, "event")
+
+            if isinstance(event, GameEvent):
+                event_node.set('type', 'game')
+
+                # Raw event data (name, date, ...)
+                etree.SubElement(event_node, "name").text = name
+                etree.SubElement(event_node, "home_channel").text = str(event.home_channel.id)
+                date = etree.SubElement(event_node, "date")
+                self._dump_date(node=date, dated_object=event)
+
+            else:
+                raise ValueError("One of the event isn't a valid event type")
+
+            # Saving the event members
+            members = etree.SubElement(event_node, "members")
+            for member in event.members.values():
+                member_node = etree.SubElement(members, "member")
+                member_node.set('id', str(member.id))
+                if member == event.admin:
+                    member_node.set('admin', "True")
+
+            # Remainders
+            remainders = etree.SubElement(event_node, "remainders")
+            for remainder in event.remainders:
+                etree.SubElement(remainders, "elem").text = str(remainder.time_from_event)
+
+        file.write(etree.tostring(root, pretty_print=True).decode("utf-8"))
+
+    @classmethod
+    def load(cls, file: str, bot):
+        """
+        Loads the event of the passed xml FILE. BOT should be connected to discord, otherwise we can't use bot.get_user
+        """
+        events = {}
+        root = etree.parse(file)
+
+        for event in root.findall("event"):
+            members = []
+            admin = None
+            members_node = event.find("members")
+
+            for member_node in members_node.findall("member"):
+                user = bot.get_user(int(member_node.get('id')))
+                members.append(user)
+                if member_node.get("admin", False):
+                    admin = user
+
+            remainders = []
+            remainders_node = event.find("remainders")
+            for elem in remainders_node.findall("elem"):
+                remainders.append(float(elem.text))
+
+            if event.get("type") == "game":
+                date = cls._load_date(event.find("date"))
+                name = event.find("name").text
+                events[name] = GameEvent(
+                    convert_to_str(date),
+                    event.find("name").text,
+                    admin,
+                    event.find('home_channel').text,
+                    remainders
+                )
+
+                for member in members:
+                    events[name].add_member(member)
+
+        return cls(events)
 
 
 class GameMaster(ExtendedBot):
@@ -24,24 +123,20 @@ class GameMaster(ExtendedBot):
         self.voice_channels = {}
         ExtendedBot.__init__(self, *args, **kwargs)
 
-    @classmethod
-    def from_binary_file(cls, file, *args, **kwargs):
-        """Returns a new GameMaster object, loaded with pickle from the file"""
+    def load_events(self, file):
+        """Loads the events from a .xml file."""
+        try:
+            self.events = {**_XmlEventsIO.load(file, bot=self).events, **self.events}
+        except (FileNotFoundError, etree.XMLSyntaxError) as e:
+            raise SyntaxError from e
 
-        """with open(file, 'rb') as f:
-            ret = pickle.load(f)
-            if isinstance(ret, _BotState):
-                return cls(games=ret.games, events=ret.events, *args, **kwargs)
-            else:
-                raise ValueError("The file returned a %s object" % ret.__class__.__name__)
+    def dump_events(self, file):
         """
-
-        raise ValueError()
-
-    def dump(self, file):
-        """Dumps self into the binary file using pickle.dump"""
-        with open(file, 'wb') as f:
-            pickle.dump(_BotState(self), f)
+        Dumps self.events into the file using a specific format. The dumped events can be loaded using
+        GameMaster(...).load_events(file)
+        """
+        with open(file, 'w') as f:
+            _XmlEventsIO(self.events).dump(f)
 
     # - - - Checks - - -
     def check_game_exists(self, name: str, err_msg: str = None):

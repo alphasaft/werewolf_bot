@@ -59,7 +59,7 @@ def __implement__(bot: GameMaster):
             return
 
         bot.add_game_event(when, name, ctx.author, ctx.channel)
-        await bot.get_channel(EVENTS_CHANNEL).send(msgs.NEW_EVENT % (name, "jeu", ctx.author.mention, when))
+        # await bot.get_channel(EVENTS_CHANNEL).send(msgs.NEW_EVENT % (name, "jeu", ctx.author.mention, when))
         await ctx.channel.send(msgs.EVENT_SUCCESSFULLY_CREATED % name)
 
     @calendar.command()

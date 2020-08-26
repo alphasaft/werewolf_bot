@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import asyncio
 import discord
+import discord.ext.tasks as tasks
 
 from bot import GameMaster
 from assets.utils import assure_assertions, configure_logger
@@ -17,11 +17,8 @@ assure_assertions()
 configure_logger(logger)
 
 # Implementing commands
-kwargs = {'command_prefix': consts.PREFIX, 'description': consts.DESCRIPTION, 'case_insensitive': True}
-try:
-    bot = GameMaster.from_binary_file(consts.BOT_STATE_PATH, **kwargs)
-except (FileNotFoundError, ValueError, EOFError):
-    bot = GameMaster(**kwargs)
+
+bot = GameMaster(command_prefix=consts.PREFIX, description=consts.DESCRIPTION, case_insensitive=True)
 
 
 commands.game_cmd.__implement__(bot)
@@ -36,15 +33,11 @@ commands.tests_cmd.__implement__(bot)
 @bot.event
 async def on_ready():
     logger.info("Ready as %s with id %s" % (bot.user.name, bot.user.id))
-    while True:
-        try:
-            await asyncio.sleep(1*60)
-            await bot.activate_events()
-        except Exception as e:
-            logger.error("%s : %s" % (e.__class__.__name__, e))
-            if isinstance(e, (asyncio.CancelledError, KeyboardInterrupt)):
-                exit(137)
-
+    try:
+        bot.load_events(consts.BOT_STATE_PATH)
+        logger.info("Loaded %i event(s)" % len(bot.events))
+    except SyntaxError:
+        pass
 
 @bot.event
 async def on_connect():
@@ -68,13 +61,11 @@ async def on_message(msg):
         if bot.devmode:
             try:
                 await bot.devtool.process_commands(msg)
-            except Exception:
-                pass
+            except:
+                msg = bot.devtool.transform_msg(msg)
+                logger.debug("Message author was truncated for %s" % msg.author.name)
             else:
                 return
-
-            msg = bot.devtool.transform_msg(msg)
-            logger.debug("Message author was truncated for %s" % msg.author.name)
 
         logger.debug("Reacting to the message...")
         await bot.react(msg)
@@ -92,14 +83,9 @@ async def on_member_join(member):
         await member.add_roles(discord.utils.get(roles, name=consts.BASE_ROLE), reason="Role de base du village")
 
 
-def finish_process(n):
-    """Ends the process with exit code N"""
-    # Recording the project state
-    bot.dialogs.save(consts.DIALOGS_PATH)
-    bot.dump(consts.BOT_STATE_PATH)
-
-    logger.info("Process ended")
-    exit(n)
+@tasks.loop(minutes=1.0)
+async def event_checking():
+    await bot.activate_events()
 
 
 if __name__ == '__main__':
@@ -107,9 +93,12 @@ if __name__ == '__main__':
         logger.info("Process started")
 
         # Launch the bot
+        event_checking.start()
         bot.run(token.TOKEN)
     except BaseException as e:
         logger.critical("Killed by %s : %s" % (e.__class__.__name__, e))
-        finish_process(1)
-    else:
-        finish_process(0)
+    finally:
+        bot.dialogs.save(consts.DIALOGS_PATH)
+        bot.dump_events(consts.BOT_STATE_PATH)
+
+        logger.info("Process ended")

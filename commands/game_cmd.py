@@ -61,7 +61,7 @@ def __implement__(bot: GameMaster):
             return
 
         bot.join_game(game_name, ctx.author)
-        logger.info("%s joined the game named %s " % (ctx.author.nale, game_name))
+        logger.info("%s joined the game named %s " % (ctx.author.name, game_name))
         await ctx.channel.send(msgs.SUCCESSFULLY_JOINED % game_name)
 
     # Change the admin of a game session
@@ -103,7 +103,7 @@ def __implement__(bot: GameMaster):
 
             elif confirm:
                 bot.delete_game(game_name)
-                logger.info("Game %s was deleted by its owner %s" % (ctx.author.name, game_name))
+                logger.info("Game %s was deleted by its owner %s" % (game_name, ctx.author.name))
                 await ctx.channel.send(msgs.SUCCESSFULLY_DELETED % game_name)
 
         else:

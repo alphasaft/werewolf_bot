@@ -6,7 +6,6 @@ import assets.messages as msgs
 import assets.constants as consts
 
 
-
 class EndStep(BaseStep):
     def __init__(self):
         BaseStep.__init__(
@@ -29,7 +28,6 @@ class EndStep(BaseStep):
 
         elif not roles.alive_players:
             await self.end(roles, dialogs)
-            return
 
         elif roles.alive_players == roles.villagers.only_alive():
             await roles.everyone.send(dialogs.everyone.villagers_won.tell(roles=roles_summary))
