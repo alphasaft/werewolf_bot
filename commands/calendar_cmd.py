@@ -32,16 +32,20 @@ La date ne doit comporter AUCUN espace !
 Aides des commandes:
 -------------------
 
-calendar add Type Nom Quand  ->  Programme un événement de ce type avec ce nom pour cette date. Un seul type ("game") \
-est pour l'instant disponible
+calendar add Type Nom Quand         ->  Programme un événement de ce type avec ce nom pour cette date. Un seul type \
+                                        ("game") est pour l'instant disponible
 
 calendar subscribe NomDeLEvenement  ->  Vous ajoute à cette partie. Vous en recevrez donc les notifications
 
-calendar quit NomDeLEvenement -> Quitte cet événement, ou le détruit si vous en êtes l'admin
+calendar quit NomDeLEvenement       ->  Quitte cet événement, ou le détruit si vous en êtes l'admin
 
-calendar present NomDeLEvenement -> Confirme votre présence à l'événement après que celui-ci ait commencé
+calendar present NomDeLEvenement    ->  Confirme votre présence à l'événement après que celui-ci ait commencé
 
-calendar list -> Liste les événements disponibles sur le serveur 
+calendar when NomDeLEvenement       ->  Retourne la date de cet événement
+
+calendar list                       ->  Liste les événements disponibles sur le serveur
+
+calendar me                         ->  Affiche les événements auquels vous êtes inscrits 
 """
 
 
@@ -68,6 +72,7 @@ def __implement__(bot: GameMaster):
             bot.check_parameter(name, "$calendar add game NomDuJeu Quand", "NomDuJeu")
             bot.check_parameter(when, "$calendar add game NomDuJeu Quand", "Quand")
             bot.check_datetime_format(when)
+            bot.check_is_not_over(when)
             bot.check_has_free_time(ctx.author.id, when)
             bot.check_name_is_available(name)
         except Exception as e:
@@ -143,3 +148,26 @@ def __implement__(bot: GameMaster):
 
         await ctx.channel.send(msgs.PRESENCE_CONFIRMED % name)
         await bot.get_admin(name).send(msgs.SOMEONE_CONFIRMED_HIS_PRESENCE % (ctx.author.mention, name))
+
+    @calendar.command()
+    async def when(ctx, name=None):
+        try:
+            bot.check_parameter(name, "$calendar when NomDeLEvenement", "NomDeLEvenement")
+            bot.check_event_exists(name)
+        except Exception as e:
+            await ctx.channel.send(e)
+
+        await ctx.channel.send(msgs.GET_EVENT_DATE % (name, clean_str_dt(convert_to_str(bot.events[name].dt))))
+
+    @calendar.command()
+    async def me(ctx):
+        events = [
+            "%s (%s)" % (name, clean_str_dt(convert_to_str(dt))) for name, dt in bot.get_joined_events(ctx.author.id)
+        ]
+        if events:
+            await ctx.channel.send(embed=msgs.GET_JOINED_EVENTS.build(events="\n- ".join(events)))
+        else:
+            await ctx.channel.send(embed=msgs.NO_JOINED_EVENTS.build())
+
+
+

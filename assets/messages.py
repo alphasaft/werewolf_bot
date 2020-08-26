@@ -205,7 +205,7 @@ EVENT_SUCCESSFULLY_CREATED = """
 """
 
 NEW_EVENT = """
-:trumpet: L'événement %s de type %s vient d'être créé par %s pour cette date/heure : %s. Inscrivez vous vite !
+:trumpet: L'événement %s de type %s vient d'être créé par %s pour cette date : %s. Inscrivez vous vite !
 """
 
 # --- calendar subscribe ---
@@ -264,6 +264,25 @@ NO_OPENED_EVENT = _EmbedSkeleton(
     title="Mince...",
     content="Il n'y a aucun événement de prévu sur ce serveur...",
     footer="Et si tu en ajoutais un ?"
+)
+
+# --- calendar when ---
+
+GET_EVENT_DATE = """
+L'événement % est prévu pour cette date : %s
+"""
+
+# --- calendar me ---
+
+GET_JOINED_EVENTS = _EmbedSkeleton(
+    title="Vous avez rejoint...",
+    content="- {events}",
+)
+
+NO_JOINED_EVENTS = _EmbedSkeleton(
+    title="Flûte...",
+    content="Vous n'avez rejoint aucune partie...",
+    footer="Pourquoi n'en créiriez vous pas une ?"
 )
 
 

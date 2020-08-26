@@ -3,7 +3,7 @@ from lxml import etree
 import datetime
 
 from .extended_bot import ExtendedBot
-from game import Session, StoryBook, Event, GameEvent, convert_to_datetime, convert_to_str
+from game import Session, StoryBook, GameEvent, convert_to_datetime, convert_to_str, is_over
 from assets.exceptions import *
 from assets.utils import make_mention
 import assets.messages as msgs
@@ -103,7 +103,7 @@ class _XmlEventsIO(object):
                     convert_to_str(date),
                     event.find("name").text,
                     admin,
-                    event.find('home_channel').text,
+                    bot.get_channel(int(event.find('home_channel').text)),
                     remainders
                 )
 
@@ -193,6 +193,11 @@ class GameMaster(ExtendedBot):
         except SyntaxError:
             raise CommandSyntaxError("Le format de date est invalide !")
 
+    @staticmethod
+    def check_is_not_over(when):
+        if is_over(convert_to_datetime(when)):
+            raise EventRelatedError("Cette date est déjà passée !")
+
     # - - - Info - - -
     def is_active(self, game):
         if self.games[game].active:
@@ -219,6 +224,9 @@ class GameMaster(ExtendedBot):
 
     def get_opened_events(self):
         return [(name, event.dt) for name, event in self.events.items()]
+
+    def get_joined_events(self, user_id):
+        return [(name, event.dt) for name, event in self.events.items() if event.has_member(user_id)]
 
     def get_game_members(self, name: str):
         return self.games[name].get_players()

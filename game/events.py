@@ -96,8 +96,12 @@ def is_over(when: str):
 
 
 def clean_str_dt(when):
-    """Clean the datetime str formtat WHEN"""
-    return convert_to_str(convert_to_datetime(when)).replace(',', ', ')
+    """Clean the datetime str format WHEN"""
+    dt = convert_to_datetime(when)
+    if (dt.year, dt.month, dt.day) == (now().year, now().month, now().day):
+        return "%02i:%02i" % (dt.hour, dt.minute)
+    else:
+        return convert_to_str(convert_to_datetime(when)).replace(',', ', ')
 
 
 # Core
@@ -165,7 +169,8 @@ class Remainder(_BaseEvent):
 
     @property
     def time_from_event(self):
-        return self.dt.timestamp() - self._event_dt.timestamp()
+        """Returns the time that separates the event from the remainders, in minutes"""
+        return round((self.dt.timestamp() - self._event_dt.timestamp())/60)
 
 
 class Event(_BaseEvent):
@@ -205,7 +210,7 @@ class Event(_BaseEvent):
         remainders = []
         _now = now()
         for remainder in _list:
-            date = datetime.datetime.utcfromtimestamp(initial_stamp + remainder)
+            date = datetime.datetime.utcfromtimestamp(initial_stamp + remainder*60)
             if remainder < 0:
                 desc = self.bef_remainder_desc or "Rappel : %s" % self.description
             else:
