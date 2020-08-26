@@ -269,7 +269,7 @@ NO_OPENED_EVENT = _EmbedSkeleton(
 # --- calendar when ---
 
 GET_EVENT_DATE = """
-L'événement % est prévu pour cette date : %s
+L'événement %s est prévu pour cette date : %s
 """
 
 # --- calendar me ---
