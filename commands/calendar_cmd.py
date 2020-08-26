@@ -170,6 +170,7 @@ def __implement__(bot: GameMaster):
             bot.check_event_exists(name)
         except Exception as e:
             await ctx.channel.send(e)
+            return
 
         await ctx.channel.send(embed=msgs.GET_EVENT_MEMBERS.build(
             members=",\n- ".join(bot.get_event_members(name)),
