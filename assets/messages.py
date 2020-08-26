@@ -205,7 +205,8 @@ EVENT_SUCCESSFULLY_CREATED = """
 """
 
 NEW_EVENT = """
-:trumpet: L'événement %s de type %s vient d'être créé par %s pour cette date : %s. Inscrivez vous vite !
+@everyone :trumpet: L'événement %s de type %s vient d'être créé par %s pour cette date : %s. Inscrivez vous vite avec \
+`$calendar subscribe %s` !
 """
 
 # --- calendar subscribe ---

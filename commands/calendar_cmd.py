@@ -32,20 +32,22 @@ La date ne doit comporter AUCUN espace !
 Aides des commandes:
 -------------------
 
-calendar add Type Nom Quand         ->  Programme un événement de ce type avec ce nom pour cette date. Un seul type \
+calendar add Type Nom Quand  ->  Programme un événement de ce type avec ce nom pour cette date. Un seul type \
                                         ("game") est pour l'instant disponible
 
 calendar subscribe NomDeLEvenement  ->  Vous ajoute à cette partie. Vous en recevrez donc les notifications
 
-calendar quit NomDeLEvenement       ->  Quitte cet événement, ou le détruit si vous en êtes l'admin
+calendar quit NomDeLEvenement  ->  Quitte cet événement, ou le détruit si vous en êtes l'admin
 
-calendar present NomDeLEvenement    ->  Confirme votre présence à l'événement après que celui-ci ait commencé
+calendar present NomDeLEvenement  ->  Confirme votre présence à l'événement après que celui-ci ait commencé
 
-calendar when NomDeLEvenement       ->  Retourne la date de cet événement
+calendar when NomDeLEvenement  ->  Retourne la date de cet événement
 
-calendar list                       ->  Liste les événements disponibles sur le serveur
+calendar list  ->  Liste les événements disponibles sur le serveur
 
-calendar me                         ->  Affiche les événements auquels vous êtes inscrits 
+calendar me  ->  Affiche les événements auquels vous êtes inscrits
+
+calendar notify NomDeLEvenement message -> Envoie le message à tous les participants de l'événément  
 """
 
 
@@ -82,7 +84,7 @@ def __implement__(bot: GameMaster):
         bot.add_game_event(when, name, ctx.author, ctx.channel)
         await ctx.channel.send(msgs.EVENT_SUCCESSFULLY_CREATED % name)
         await bot.get_channel(EVENTS_CHANNEL).send(
-            msgs.NEW_EVENT % (name, "jeu", ctx.author.mention, clean_str_dt(when))
+            msgs.NEW_EVENT % (name, "jeu", ctx.author.mention, clean_str_dt(when), name)
         )
 
     @calendar.command()
@@ -130,7 +132,7 @@ def __implement__(bot: GameMaster):
 
     @calendar.command(name="list")
     async def _list(ctx):
-        events = ["%s (%s)" % (name, convert_to_str(dt)) for name, dt in bot.get_opened_events()]
+        events = ["%s (%s)" % (name, clean_str_dt(convert_to_str(dt))) for name, dt in bot.get_opened_events()]
         if events:
             await ctx.channel.send(embed=msgs.OPENED_EVENTS_LIST.build(events="\n- ".join(events)))
         else:
@@ -147,7 +149,7 @@ def __implement__(bot: GameMaster):
             return
 
         await ctx.channel.send(msgs.PRESENCE_CONFIRMED % name)
-        await bot.get_admin(name).send(msgs.SOMEONE_CONFIRMED_HIS_PRESENCE % (ctx.author.mention, name))
+        await bot.get_admin(name).send(msgs.SOMEONE_CONFIRMED_HIS_PRESENCE % (ctx.author.display_name, name))
 
     @calendar.command()
     async def when(ctx, name=None):
@@ -169,5 +171,15 @@ def __implement__(bot: GameMaster):
         else:
             await ctx.channel.send(embed=msgs.NO_JOINED_EVENTS.build())
 
+    @calendar.command()
+    async def notify(ctx, name, *msg):
+        try:
+            bot.check_event_exists(name)
+            bot.check_has_joined_event(ctx.author.id, name)
+        except Exception as e:
+            await ctx.channel.send(e)
+            return
+
+        await bot.events[name].notify(" ".join(msg))
 
 
