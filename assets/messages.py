@@ -254,7 +254,6 @@ L'événement %s a bien été détruit.
 
 # --- calendar list ---
 
-
 OPENED_EVENTS_LIST = _EmbedSkeleton(
     title="Voici la liste des événements de ce serveur :",
     content="- {events}",
@@ -267,11 +266,6 @@ NO_OPENED_EVENT = _EmbedSkeleton(
     footer="Et si tu en ajoutais un ?"
 )
 
-# --- calendar when ---
-
-GET_EVENT_DATE = """
-L'événement %s est prévu pour cette date : %s
-"""
 
 # --- calendar me ---
 
@@ -285,6 +279,19 @@ NO_JOINED_EVENTS = _EmbedSkeleton(
     content="Vous n'avez rejoint aucune partie...",
     footer="Pourquoi n'en créiriez vous pas une ?"
 )
+
+# --- calendar members ---
+
+GET_EVENT_MEMBERS = _EmbedSkeleton(
+    title="Liste des membres de l'évènement {name}",
+    content="- {members}"
+)
+
+# --- calendar when ---
+
+GET_EVENT_DATE = """
+L'événement %s est prévu pour cette date : %s
+"""
 
 
 # --- kick ---

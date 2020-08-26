@@ -47,12 +47,14 @@ calendar list  ->  Liste les événements disponibles sur le serveur
 
 calendar me  ->  Affiche les événements auquels vous êtes inscrits
 
+calendar members NomDeLEvenement -> Afiche la liste des membres de cet événement
+
 calendar notify NomDeLEvenement message -> Envoie le message à tous les participants de l'événément  
 """
 
 
 def __implement__(bot: GameMaster):
-    """Implement the command 'calender' in the bot. Unable to use that command if not implemented"""
+    """Implement the command 'calendar' in the bot. Unable to use that command if not implemented"""
 
     @bot.group(brief=BRIEF, help=FULL)
     async def calendar(ctx):
@@ -152,16 +154,6 @@ def __implement__(bot: GameMaster):
         await bot.get_admin(name).send(msgs.SOMEONE_CONFIRMED_HIS_PRESENCE % (ctx.author.display_name, name))
 
     @calendar.command()
-    async def when(ctx, name=None):
-        try:
-            bot.check_parameter(name, "$calendar when NomDeLEvenement", "NomDeLEvenement")
-            bot.check_event_exists(name)
-        except Exception as e:
-            await ctx.channel.send(e)
-
-        await ctx.channel.send(msgs.GET_EVENT_DATE % (name, clean_str_dt(convert_to_str(bot.events[name].dt))))
-
-    @calendar.command()
     async def me(ctx):
         events = [
             "%s (%s)" % (name, clean_str_dt(convert_to_str(dt))) for name, dt in bot.get_joined_events(ctx.author.id)
@@ -172,6 +164,29 @@ def __implement__(bot: GameMaster):
             await ctx.channel.send(embed=msgs.NO_JOINED_EVENTS.build())
 
     @calendar.command()
+    async def members(ctx, name=None):
+        try:
+            bot.check_parameter(name, "$calendar members NomDeLEvenement", "NomDeLEvenement")
+            bot.check_event_exists(name)
+        except Exception as e:
+            await ctx.channel.send(e)
+
+        await ctx.channel.send(embed=msgs.GET_EVENT_MEMBERS.build(
+            members=",\n- ".join(bot.get_event_members(name)),
+            name=name
+        ))
+
+    @calendar.command()
+    async def when(ctx, name=None):
+        try:
+            bot.check_parameter(name, "$calendar when NomDeLEvenement", "NomDeLEvenement")
+            bot.check_event_exists(name)
+        except Exception as e:
+            await ctx.channel.send(e)
+
+        await ctx.channel.send(msgs.GET_EVENT_DATE % (name, clean_str_dt(convert_to_str(bot.events[name].dt))))
+
+    @calendar.command()
     async def notify(ctx, name, *msg):
         try:
             bot.check_event_exists(name)
@@ -180,6 +195,6 @@ def __implement__(bot: GameMaster):
             await ctx.channel.send(e)
             return
 
-        await bot.events[name].notify(" ".join(msg))
+        await bot.events[name].notify(ctx.author.name + " : " + " ".join(msg))
 
 

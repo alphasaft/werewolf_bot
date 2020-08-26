@@ -108,6 +108,10 @@ def clean_str_dt(when):
 # - - - - - - - - -
 
 class _BaseEvent(object):
+    """
+    Represents a dated object, also the skeleton of a valid event. Warning, the datetime must have been built using
+    datetime.datetime.utcfromstamp OR with the basic constructor (__init__), else its timestamp is invalid.
+    """
     def __init__(self, dt: datetime.datetime, description):
         self.dt = dt
 
@@ -224,11 +228,16 @@ class Event(_BaseEvent):
         self.members[member.id] = member
 
     def remove_member(self, user_id):
+        """Remove a member from the event"""
         self.members.pop(user_id)
 
     def has_member(self, user_id):
         """Returns True if the user belongs to this event, False otherwise"""
         return user_id in self.members
+
+    def get_members(self):
+        """Returns the list of the event members"""
+        return list(self.members.values())
 
     def confirm_presence(self, user_id):
         """
@@ -236,7 +245,7 @@ class Event(_BaseEvent):
         It raises a BelongingError if the user doesn't belong to this event or an EventRelatedError in the case the
         event hasn't yet begin
         """
-        if user_id not in self.members:
+        if not self.has_member(user_id):
             raise BelongingError("Vous n'appartenez pas à cet événement !")
 
         if user_id in self.present_members:
