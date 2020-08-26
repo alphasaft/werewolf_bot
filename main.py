@@ -34,10 +34,11 @@ commands.tests_cmd.__implement__(bot)
 async def on_ready():
     logger.info("Ready as %s with id %s" % (bot.user.name, bot.user.id))
     try:
-        bot.load_events(consts.BOT_STATE_PATH)
+        bot.load_events(consts.EVENTS_PATH)
         logger.info("Loaded %i event(s)" % len(bot.events))
-    except SyntaxError:
-        pass
+    except (SyntaxError, FileNotFoundError):
+        logger.warn("Event loading failed")
+
 
 @bot.event
 async def on_connect():
@@ -99,6 +100,6 @@ if __name__ == '__main__':
         logger.critical("Killed by %s : %s" % (e.__class__.__name__, e))
     finally:
         bot.dialogs.save(consts.DIALOGS_PATH)
-        bot.dump_events(consts.BOT_STATE_PATH)
+        bot.dump_events(consts.EVENTS_PATH)
 
         logger.info("Process ended")

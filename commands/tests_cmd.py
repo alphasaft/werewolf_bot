@@ -1,4 +1,5 @@
-from assets.constants import EXPEDITIONS_CATEGORY, GUILD
+from assets.constants import EXPEDITIONS_CATEGORY
+from assets.utils import get_id
 from discord.ext.commands import has_permissions
 from discord.utils import get
 
@@ -6,6 +7,7 @@ from discord.utils import get
 PURGE_EXP_HELP = """Supprime tous les channels EXPEDITIONS"""
 ERASE_TEST_HELP = """Supprime les traces du dernier test"""
 DISCONNECT_HELP = """Déconnecte le bot"""
+ID_HELP = """Renvoie l'id correspondant à la mention"""
 
 
 def __implement__(bot):
@@ -34,3 +36,8 @@ def __implement__(bot):
     async def disconnect(ctx):
         await ctx.channel.send("Disconnecting...")
         exit(0)
+
+    @bot.command(name='id', help=ID_HELP)
+    @has_permissions(administrator=True)
+    async def _id(ctx, mention):
+        await ctx.channel.send(get_id(mention))

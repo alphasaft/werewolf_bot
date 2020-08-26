@@ -17,7 +17,7 @@ TIMEZONE = _TIMEZONE * 3600
 # Game constants
 
 DIALOGS_PATH = "data/story.json"
-BOT_STATE_PATH = "data/events.xml"
+EVENTS_PATH = "data/events.xml"
 MINIMUM_PLAYERS = 4
 ALLTIMES_CMDS = ('admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes', 'again', 'kick')
 WHITE_VOTE = "Vote blanc"
