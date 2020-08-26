@@ -41,7 +41,7 @@ class EndStep(BaseStep):
         """ `*again` : Démarre une nouvelle partie """
         try:
             assert not args, msgs.TOO_MUCH_PARAMETERS % ("again", ", ".join(args))
-            roles.check_is_admin(author)
+            roles.check_is_game_admin(author)
             assert len(session.players) >= consts.MINIMUM_PLAYERS, "Pas assez de joueurs !"
         except Exception as e:
             await self.error(to=author, msg=e)

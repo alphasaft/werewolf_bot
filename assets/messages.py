@@ -130,26 +130,26 @@ Retournez dans votre partie (fil de discussion privé avec Clyde the Storyteller
 
 CONFIRM_FOR_GAME_DESTRUCTION = """
 :exclamation: Attention :exclamation:
-Etant l'adminstrateur de la partie %s, la quitter la détruira ! Êtes vous sûr ?
+Etant l'adminstrateur de la partie %s, la quitter la détruira ! Êtes vous sûr(e) ?
 """
 
-SUCCESSFULLY_DELETED = """
+GAME_SUCCESSFULLY_DELETED = """
 La partie %s a bien été détruite.
 """
 
-SUCCESSFULLY_QUITED = """
+GAME_SUCCESSFULLY_QUITED = """
 Vous avez quitté la partie %s avec succès
 """
 
 
 # --- game kick ---
 
-SUCCESSFULLY_KICKED = """
+SUCCESSFULLY_KICKED_FROM_GAME = """
 Le joueur %s a bien été kické de la partie %s
 """
 
 CANNOT_KICK_YOURSELF = """
-Vous ne pouvez pas vous banir vous-même de la partie ; Utilisez $game quit pour la quiter.
+Vous ne pouvez pas vous banir vous-même !
 """
 
 
@@ -213,6 +213,58 @@ NEW_EVENT = """
 EVENT_SUCCESSFULLY_SUBSCRIBED = """
 :grin: Vous avez bien rejoint l'événement %s !
 """
+
+SOMEONE_JOINED_YOUR_EVENT = """
+:hushed: %s a rejoint votre événement %s ! 
+"""
+
+# --- calendar present ---
+
+PRESENCE_CONFIRMED = """
+:white_check_mark: Votre présence a bien été confirmée pour l'événement %s !
+"""
+
+SOMEONE_CONFIRMED_HIS_PRESENCE = """
+:v: %s est bien présent pour votre événement %s !
+"""
+
+# --- calendar quit ---
+
+EVENT_NOT_JOINED = """
+L'utilisateur %s n'a pas rejoint l'événement %s !
+"""
+
+SOMEONE_QUITED_YOUR_EVENT = """
+:persevere: %s vient de quitter votre événement %s...
+"""
+
+CONFIRM_FOR_EVENT_DESTRUCTION = """
+:exclamation: Attention :exclamation:
+Étant l'administrateur de l'événement %s, le quitter le détruira. Êtes vous sûr(e) ?
+"""
+
+EVENT_SUCCESSFULLY_QUITED = """
+Vous avez bien quitté l'événement %s !
+"""
+
+EVENT_SUCCESSFULLY_DELETED = """
+L'événement %s a bien été détruit.
+"""
+
+# --- calendar list ---
+
+
+OPENED_EVENTS_LIST = _EmbedSkeleton(
+    title="Voici la liste des événements de ce serveur :",
+    content="- {events}",
+    footer="Utilisez $calendar subscribe UnÉvénement pour en rejoindre un"
+)
+
+NO_OPENED_EVENT = _EmbedSkeleton(
+    title="Mince...",
+    content="Il n'y a aucun événement de prévu sur ce serveur...",
+    footer="Et si tu en ajoutais un ?"
+)
 
 
 # --- kick ---

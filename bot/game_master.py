@@ -134,8 +134,7 @@ class GameMaster(ExtendedBot):
         Dumps self.events into the file using a specific format. The dumped events can be loaded using
         GameMaster(...).load_events(file)
         """
-        with open(file, 'w') as f:
-            _XmlEventsIO(self.events).dump(f)
+        _XmlEventsIO(self.events).dump(file)
 
     # - - - Checks - - -
     def check_game_exists(self, name: str, err_msg: str = None):
@@ -150,7 +149,7 @@ class GameMaster(ExtendedBot):
         if self.games.get(name) or self.events.get(name):
             raise GameRelatedError(err_msg or (msgs.NAME_ALREADY_TAKEN % name))
 
-    def check_is_admin(self, user_id: str, err_msg: str = None):
+    def check_is_game_admin(self, user_id: str, err_msg: str = None):
         if not self.games[self.which_game(user_id)].admin.id == user_id:
             raise CommandPermissionError(err_msg or (msgs.MISSING_PERMISSIONS % ('admin', self.which_game(user_id))))
 
@@ -159,7 +158,7 @@ class GameMaster(ExtendedBot):
         if belong_to:
             raise AvailabilityError(err_msg or (msgs.HAS_ALREADY_JOINED % belong_to))
 
-    def check_has_joined(self, user_id, game_name=None):
+    def check_has_joined_game(self, user_id, game_name=None):
         if game_name is None:
             if not self.which_game(user_id):
                 raise BelongingError(msgs.NO_GAME_JOINED % (make_mention(user_id), 'de partie'))
@@ -167,12 +166,16 @@ class GameMaster(ExtendedBot):
             if not self.games[game_name].has_player(user_id):
                 raise BelongingError(msgs.NO_GAME_JOINED % (make_mention(user_id), 'la partie '+game_name))
 
+    def check_has_joined_event(self, user_id, event_name):
+        if not self.events[event_name].has_member(user_id):
+            raise BelongingError(msgs.EVENT_NOT_JOINED % (make_mention(user_id), event_name))
+
     def check_can_launch(self, name: str):
         players = len(self.games[name].get_players())
         if players < consts.MINIMUM_PLAYERS:
             raise GameRelatedError(msgs.MISSING_PLAYERS % (name, players))
 
-    def check_is_available(self, name: str):
+    def check_game_is_available(self, name: str):
         if self.games[name].active:
             raise GameRelatedError(msgs.GAME_NOT_AVAILABLE % name)
 
@@ -182,6 +185,13 @@ class GameMaster(ExtendedBot):
             if user_id in event.members.keys():
                 raise AvailabilityError(msgs.NO_FREE_TIME % name)
         return True
+
+    @staticmethod
+    def check_datetime_format(when):
+        try:
+            convert_to_datetime(when)
+        except SyntaxError:
+            raise CommandSyntaxError("Le format de date est invalide !")
 
     # - - - Info - - -
     def is_active(self, game):
@@ -196,13 +206,19 @@ class GameMaster(ExtendedBot):
                 return name
 
     def get_admin(self, name: str):
-        return self.games[name].admin
+        if self.games.get(name):
+            return self.games[name].admin
+        elif self.events.get(name):
+            return self.events[name].admin
 
     def get_games(self):
         return list(self.games.keys())
 
     def get_opened_games(self):
         return [name for name, g in self.games.items() if not g.active]
+
+    def get_opened_events(self):
+        return [(name, event.dt) for name, event in self.events.items()]
 
     def get_game_members(self, name: str):
         return self.games[name].get_players()
@@ -243,6 +259,12 @@ class GameMaster(ExtendedBot):
     # - - - Events - - -
     def add_game_event(self, when, name, admin, home_channel):
         self.events[name] = GameEvent(when, name, admin=admin, home_channel=home_channel)
+
+    def delete_event(self, name):
+        self.events.pop(name)
+
+    def quit_event(self, user_id, name):
+        self.events[name].remove_member(user_id)
 
     def add_event_member(self, name, member):
         self.events[name].add_member(member)

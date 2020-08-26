@@ -55,7 +55,7 @@ def __implement__(bot: GameMaster):
             bot.check_parameter(game_name, "game join unePartie", "unePartie")
             bot.check_game_exists(game_name)
             bot.check_is_alone(ctx.author.id)
-            bot.check_is_available(game_name)
+            bot.check_game_is_available(game_name)
         except Exception as e:
             await ctx.channel.send(e)
             return
@@ -70,9 +70,9 @@ def __implement__(bot: GameMaster):
         new_admin = get_id(new_admin)
         try:
             bot.check_parameter(new_admin, "game admin unJoueur", "unJoueur")
-            bot.check_has_joined(ctx.author.id)
-            bot.check_has_joined(new_admin, bot.which_game(ctx.author.id))
-            bot.check_is_admin(ctx.author.id)
+            bot.check_has_joined_game(ctx.author.id)
+            bot.check_has_joined_game(new_admin, bot.which_game(ctx.author.id))
+            bot.check_is_game_admin(ctx.author.id)
         except Exception as e:
             await ctx.channel.send(e)
             return
@@ -85,7 +85,7 @@ def __implement__(bot: GameMaster):
     @game.command(name='quit')
     async def _quit(ctx):
         try:
-            bot.check_has_joined(ctx.author.id)
+            bot.check_has_joined_game(ctx.author.id)
             bot.check_can_confirm(ctx.author)
             assert not bot.is_active(bot.which_game(ctx.author.id)), msgs.CANNOT_QUIT_IN_GAME
         except Exception as e:
@@ -104,12 +104,12 @@ def __implement__(bot: GameMaster):
             elif confirm:
                 bot.delete_game(game_name)
                 logger.info("Game %s was deleted by its owner %s" % (game_name, ctx.author.name))
-                await ctx.channel.send(msgs.SUCCESSFULLY_DELETED % game_name)
+                await ctx.channel.send(msgs.GAME_SUCCESSFULLY_DELETED % game_name)
 
         else:
             bot.quit_game(ctx.author.id)
             logger.info("%s quited the game %s" % (ctx.author.name, bot.which_game(ctx.author.id)))
-            await ctx.channel.send(msgs.SUCCESSFULLY_QUITED % game_name)
+            await ctx.channel.send(msgs.GAME_SUCCESSFULLY_QUITED % game_name)
 
     # Kick a player from your game
     @game.command()
@@ -117,9 +117,9 @@ def __implement__(bot: GameMaster):
         player = get_id(player)
         try:
             bot.check_parameter(player, "!game kick unJoueur", "unJoueur")
-            bot.check_has_joined(ctx.author.id)
-            bot.check_has_joined(player, bot.which_game(ctx.author.id))
-            bot.check_is_admin(ctx.author.id)
+            bot.check_has_joined_game(ctx.author.id)
+            bot.check_has_joined_game(player, bot.which_game(ctx.author.id))
+            bot.check_is_game_admin(ctx.author.id)
             if player == ctx.author.id:
                 raise NameError(msgs.CANNOT_KICK_YOURSELF)
         except Exception as e:
@@ -129,7 +129,7 @@ def __implement__(bot: GameMaster):
         game = bot.which_game(player)
         bot.quit_game(player)
         logger.info("%s was kicked of the game %s" % (ctx.author.name, bot.which_game(ctx.author.id)))
-        await ctx.channel.send(msgs.SUCCESSFULLY_KICKED % (make_mention(player), game))
+        await ctx.channel.send(msgs.SUCCESSFULLY_KICKED_FROM_GAME % (make_mention(player), game))
 
     # Get the list of the available games
     @game.command(name='list')
@@ -163,8 +163,8 @@ def __implement__(bot: GameMaster):
     async def start(ctx, *too):
         try:
             bot.check_not_too_much_parameters(too, "!game start")
-            bot.check_has_joined(ctx.author.id)
-            bot.check_is_admin(ctx.author.id)
+            bot.check_has_joined_game(ctx.author.id)
+            bot.check_is_game_admin(ctx.author.id)
             bot.check_can_launch(bot.which_game(ctx.author.id))
         except Exception as e:
             await ctx.channel.send(e)

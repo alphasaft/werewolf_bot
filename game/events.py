@@ -45,7 +45,7 @@ def convert_to_datetime(s: str):
 
     match = _DATETIME_REGEX.match(s)
     if not match:
-        raise ValueError("Invalid datetime format has been passed")
+        raise SyntaxError("Invalid datetime format has been passed")
 
     def get(info):
         ret = match.group(info)
@@ -63,8 +63,9 @@ def convert_to_datetime(s: str):
     minute = get('minute')
 
     if forward:
-        dt = datetime.datetime.utcfromtimestamp(time.time() + TIMEZONE + forward * 3600 * 24)
-        dt.replace(hour=hour, minute=minute)
+        dt = datetime.datetime.utcfromtimestamp(
+            time.time() + TIMEZONE + forward * 3600 * 24
+        ).replace(hour=hour, minute=minute)
 
     elif day:
         if month < _now.month or (month == _now.month and day < _now.day):
@@ -92,6 +93,11 @@ def convert_to_str(dt: datetime.datetime):
 def is_over(when: str):
     """Returns True if the described date and time belong to the past else False"""
     return now() > convert_to_datetime(when)
+
+
+def clean_str_dt(when):
+    """Clean the datetime str formtat WHEN"""
+    return convert_to_str(convert_to_datetime(when)).replace(',', ', ')
 
 
 # Core
@@ -211,6 +217,13 @@ class Event(_BaseEvent):
     def add_member(self, member):
         """Add a member to the event"""
         self.members[member.id] = member
+
+    def remove_member(self, user_id):
+        self.members.pop(user_id)
+
+    def has_member(self, user_id):
+        """Returns True if the user belongs to this event, False otherwise"""
+        return user_id in self.members
 
     def confirm_presence(self, user_id):
         """

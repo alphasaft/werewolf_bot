@@ -96,7 +96,7 @@ class ExtendedBot(Bot):
         return True if confirmation.content == confirm else False
 
     def check_can_confirm(self, user):
-        """Checks that self isn't waiting for a confirmation from USER, else raises a RuntimeError"""
+        """Checks that self isn't waiting for a confirmation from USER, else raises an Availability"""
         already_waiting = self._waiting_for_confirmations.get(user)
         if already_waiting:
             raise AvailabilityError(msgs.ALREADY_WAITING % already_waiting)

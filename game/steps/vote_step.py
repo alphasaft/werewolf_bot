@@ -93,7 +93,7 @@ class VoteStep(BaseStep):
         try:
             target = unpack(args, "!voteforall unJoueur")
             roles.check_has_player(target)
-            roles.check_is_admin(author)
+            roles.check_is_game_admin(author)
         except Exception as e:
             await self.error(to=author, msg=e)
             return

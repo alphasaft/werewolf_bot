@@ -1,6 +1,12 @@
 from bot import GameMaster
 from assets.constants import EVENTS_CHANNEL
+from assets.utils import configure_logger
+import assets.logger as logger
 import assets.messages as msgs
+from game.events import convert_to_str, clean_str_dt
+
+
+configure_logger(logger)
 
 
 BRIEF = """Organise vos parties de jeu"""
@@ -20,13 +26,22 @@ Ce qui donne par exemple:
     18:00          -->  Aujourd'hui, 18h00
     today+3,19:30  -->  Dans 3 jours, à 19h30
 
-:exclamation: Attention :exclamation: 
+! Attention ! 
 La date ne doit comporter AUCUN espace !
 
 Aides des commandes:
+-------------------
 
-calendar add NomDeLaPartie Quand  ->  Programme une partie pour cette date
-calendar subscribe NomDeLaPartie  ->  Vous ajoute à cette partie. Vous en recevrez donc les notifications
+calendar add Type Nom Quand  ->  Programme un événement de ce type avec ce nom pour cette date. Un seul type ("game") \
+est pour l'instant disponible
+
+calendar subscribe NomDeLEvenement  ->  Vous ajoute à cette partie. Vous en recevrez donc les notifications
+
+calendar quit NomDeLEvenement -> Quitte cet événement, ou le détruit si vous en êtes l'admin
+
+calendar present NomDeLEvenement -> Confirme votre présence à l'événement après que celui-ci ait commencé
+
+calendar list -> Liste les événements disponibles sur le serveur 
 """
 
 
@@ -52,6 +67,7 @@ def __implement__(bot: GameMaster):
         try:
             bot.check_parameter(name, "$calendar add game NomDuJeu Quand", "NomDuJeu")
             bot.check_parameter(when, "$calendar add game NomDuJeu Quand", "Quand")
+            bot.check_datetime_format(when)
             bot.check_has_free_time(ctx.author.id, when)
             bot.check_name_is_available(name)
         except Exception as e:
@@ -59,8 +75,10 @@ def __implement__(bot: GameMaster):
             return
 
         bot.add_game_event(when, name, ctx.author, ctx.channel)
-        # await bot.get_channel(EVENTS_CHANNEL).send(msgs.NEW_EVENT % (name, "jeu", ctx.author.mention, when))
         await ctx.channel.send(msgs.EVENT_SUCCESSFULLY_CREATED % name)
+        await bot.get_channel(EVENTS_CHANNEL).send(
+            msgs.NEW_EVENT % (name, "jeu", ctx.author.mention, clean_str_dt(when))
+        )
 
     @calendar.command()
     async def subscribe(ctx, name=None):
@@ -73,7 +91,45 @@ def __implement__(bot: GameMaster):
             return
 
         bot.add_event_member(name, ctx.author)
+        await bot.get_admin(name).send(msgs.SOMEONE_JOINED_YOUR_EVENT % (ctx.author.mention, name))
         await ctx.channel.send(msgs.EVENT_SUCCESSFULLY_SUBSCRIBED % name)
+
+    @calendar.command(name='quit')
+    async def _quit(ctx, name=None):
+        try:
+            bot.check_parameter(name, "$calendar quit NomDeLEvenement", "NomDeLEvenement")
+            bot.check_event_exists(name)
+            bot.check_has_joined_event(ctx.author.id, name)
+            bot.check_can_confirm(ctx.author)
+        except Exception as e:
+            await ctx.channel.send(e)
+            return
+
+        if bot.get_admin(name) == ctx.author:
+            await ctx.channel.send(msgs.CONFIRM_FOR_EVENT_DESTRUCTION % name)
+            confirm = await bot.confirm(ctx.author, "$calendar quit (admin)")
+
+            if confirm is None:
+                return
+
+            elif confirm:
+                bot.delete_event(name)
+                logger.info("Event %s was deleted by its owner %s" % (name, ctx.author.name))
+                await ctx.channel.send(msgs.EVENT_SUCCESSFULLY_DELETED % name)
+
+        else:
+            bot.quit_event(ctx.author.id, name)
+            logger.info("%s quited the event %s" % (ctx.author.name, bot.which_game(ctx.author.id)))
+            await bot.get_admin(name).send(msgs.SOMEONE_JOINED_YOUR_EVENT % (ctx.author.mention, name))
+            await ctx.channel.send(msgs.EVENT_SUCCESSFULLY_QUITED % name)
+
+    @calendar.command(name="list")
+    async def _list(ctx):
+        events = ["%s (%s)" % (name, convert_to_str(dt)) for name, dt in bot.get_opened_events()]
+        if events:
+            await ctx.channel.send(embed=msgs.OPENED_EVENTS_LIST.build(events="\n- ".join(events)))
+        else:
+            await ctx.channel.send(embed=msgs.NO_OPENED_EVENT.build())
 
     @calendar.command()
     async def present(ctx, name=None):
@@ -85,4 +141,5 @@ def __implement__(bot: GameMaster):
             await ctx.channel.send(e)
             return
 
-        await ctx.channel.send(":white_check_mark: Votre présence a bien été confirmée pour l'événement %s !" % name)
+        await ctx.channel.send(msgs.PRESENCE_CONFIRMED % name)
+        await bot.get_admin(name).send(msgs.SOMEONE_CONFIRMED_HIS_PRESENCE % (ctx.author.mention, name))

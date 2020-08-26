@@ -131,7 +131,7 @@ class BaseStep:
         """ `*skip` : Passe cette étape du jeu. À n'utiliser qu'en cas de problèmes."""
         try:
             assert not args, msgs.TOO_MUCH_PARAMETERS % (", ".join(args), "$skip")
-            roles.check_is_admin(author)
+            roles.check_is_game_admin(author)
         except Exception as e:
             await self.error(to=author, msg=e)
 
@@ -216,7 +216,7 @@ class BaseStep:
         """ `*kick unJoueur` : Kick ce joueur de la partie """
         try:
             kicked = unpack(args, '!kick unJoueur')
-            roles.check_is_admin(author)
+            roles.check_is_game_admin(author)
             assert roles.get_role_by_name(kicked), msgs.NO_SUCH_PLAYER % kicked
         except Exception as e:
             await self.error(author.user, str(e))
@@ -235,7 +235,7 @@ class BaseStep:
         """ `*admin unJoueur` : Change l'administrateur de la partie pour unJoueur """
         try:
             new_admin = unpack(args, '!admin unJoueur')
-            roles.check_is_admin(author)
+            roles.check_is_game_admin(author)
             assert roles.get_role_by_name(new_admin), msgs.NO_SUCH_PLAYER % new_admin
         except Exception as e:
             await self.error(author.user, str(e))
