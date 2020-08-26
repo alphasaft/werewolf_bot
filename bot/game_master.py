@@ -195,7 +195,7 @@ class GameMaster(ExtendedBot):
 
     @staticmethod
     def check_is_not_over(when):
-        if is_over(convert_to_datetime(when)):
+        if is_over(when):
             raise EventRelatedError("Cette date est déjà passée !")
 
     # - - - Info - - -
