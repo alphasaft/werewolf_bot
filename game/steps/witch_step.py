@@ -7,7 +7,7 @@ class WitchStep(BaseStep):
     def __init__(self):
         BaseStep.__init__(
             self,
-            active_role=WITCH,
+            active_roles=WITCH,
             helps=(
                 "Ressucitez quelqu'un avec `*resurrect (unJoueur)`, tuez-en un avec `*kill unJoueur` ou ne faites rien "
                 "avec `*pass`", "La socière choisit que faire")

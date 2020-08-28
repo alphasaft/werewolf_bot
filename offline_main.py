@@ -2,7 +2,7 @@ import asyncio
 from traceback import extract_stack
 
 from game.session import Session
-from game.dialogs import StoryBook
+from game import StoryBook
 from random import randint
 import assets.constants as consts
 
@@ -28,8 +28,11 @@ class OfflineUser:
     def mention(self):
         return '@'+self.name
 
-    async def send(self, content):
-        print("<To %s> %s" % (self.mention, content))
+    async def send(self, content, *, embed=None, **kwargs):
+        if content:
+            print("<To %s> %s" % (self.mention, content))
+        elif embed:
+            print("<To %s> %s" % (self.mention, embed.description))
 
 
 class OfflineBot:
@@ -66,7 +69,7 @@ class OfflineBotDmChannels:
                 if self.bot:
                     await self.bot.react(OfflineMessage(msg, self.logged_user))
 
-    def send(self, msg):
+    def send(self, msg, **kwargs):
         """Sends the message MSG only if MSG.author == self.logged_user"""
         if msg.author == self.logged_user:
             print("<To %s> %s" % msg.author, msg.content)

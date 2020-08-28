@@ -6,7 +6,7 @@ import time
 import re
 import random
 
-from assets.constants import PREFIX
+from assets.constants import PREFIX, TIMEZONE
 
 
 # Exceptions

@@ -1,6 +1,7 @@
 import game.steps
 import assets.logger as logger
 from assets.utils import configure_logger
+from assets.constants import WEREWOLF
 
 
 # Logger configuration
@@ -35,10 +36,13 @@ class StepList:
         self._steps.extend(self._turn or [])
 
     def _check_game_is_over(self, roles):
-        if (len(roles.alive_players) == 2 and list(roles.alive_players)[0].loving == list(roles.alive_players)[1] or
-                roles.alive_players == roles.villagers.only_alive() or
-                roles.alive_players == roles.were_wolfs.only_alive() or
-                not roles.alive_players):
+        if any((
+            (len(roles.alive_players) == 2 and list(roles.alive_players)[0].loving == list(roles.alive_players)[1] and
+             (list(roles.alive_players)[0].role == WEREWOLF) ^ (list(roles.alive_players)[1].role == WEREWOLF)),
+            roles.alive_players == roles.villagers.only_alive(),
+            roles.alive_players == roles.were_wolfs.only_alive(),
+            not roles.alive_players
+        )):
             self._end_step_enabled = True
 
     async def next_step(self, roles, dialogs):

@@ -33,11 +33,12 @@ commands.tests_cmd.__implement__(bot)
 @bot.event
 async def on_ready():
     logger.info("Ready as %s with id %s" % (bot.user.name, bot.user.id))
-    try:
-        bot.load_events(consts.EVENTS_PATH)
-        logger.info("Loaded %i event(s)" % len(bot.events))
-    except (SyntaxError, FileNotFoundError):
-        logger.warn("Event loading failed")
+    if not bot.events:
+        try:
+            bot.load_events(consts.EVENTS_PATH)
+            logger.info("Loaded %i event(s)" % len(bot.events))
+        except (SyntaxError, FileNotFoundError):
+            logger.warn("Event loading failed")
 
 
 @bot.event
@@ -86,7 +87,11 @@ async def on_member_join(member):
 
 @tasks.loop(minutes=1.0)
 async def event_checking():
-    await bot.activate_events()
+    try:
+        await bot.activate_events()
+    except BaseException as e:
+        logger.error(e.__class__.__name__, str(e))
+        event_checking.close()
 
 
 if __name__ == '__main__':

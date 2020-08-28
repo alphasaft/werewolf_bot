@@ -114,7 +114,7 @@ La partie %s ne peut pas être jointe, car elle est en cours :cry:
 # --- game admin ---
 
 FAILED_ADMIN_CHANGE = """
-Le joueur %s n'a pas pu être mis administrateur de la partie %s, car il ne l'a pas jointe. :x:
+:x: Le joueur %s n'a pas pu être mis administrateur de la partie %s, car il ne l'a pas jointe.
 """
 
 ADMIN_SUCCESSFULLY_CHANGED = """
@@ -415,6 +415,18 @@ Le message que vous avez envoyé (%s) a provoqué une erreur lors de son envoi a
 rapidement relayé aux développeurs afin de le résoudre.
 """
 
+
+# EVENTS
+
+GAME_CREATED_BY_EVENT = """
+La partie %s vient d'être automatiquement créé par l'événement du même nom ! Tape simplement "$calendar present %s" pour
+confirmer ta présence et la rejoindre au passage ! 
+"""
+
+GAME_JOINED_BY_EVENT = """
+Vous venez de rejoindre la partie-événement %s ! Pour lancer des commandes en rapport avec cette partie, tapez par
+exemple $game members %s, sans oublier le "-game"
+"""
 
 # --- Game beginner's guide ---
 

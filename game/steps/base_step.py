@@ -16,16 +16,16 @@ class BaseStep:
     Override them if what they currently do is not what you want to do.
     """
 
-    def __init__(self, active_role=None, helps=()):
+    def __init__(self, active_roles=None, helps=()):
         """
         Initialize self.
 
         Active_role describe the current active player, everyone (None) by default.
         Helps is a maximum-two-sized tuple, that contains first a help for the active role, and second for the others
-        (this is not necessary provided when active_role is None)
+        (that is also not necessary provided when active_role is None)
         """
         self.ended = False
-        self.active_role = active_role
+        self.active_role = active_roles
 
         self.active_help = (helps[0] if len(helps) > 0 else "Pas d'aide disponible").replace('*', PREFIX)
         self.external_help = (helps[1] if len(helps) > 1 else "En attente d'un autre joueur").replace('*', PREFIX)
@@ -43,7 +43,11 @@ class BaseStep:
         await to.send(indented(suppress_markdown(str(msg).strip())))
 
     def is_current_role(self, user):
-        return not self.active_role or user.role == self.active_role
+        return any((
+            not self.active_role,
+            isinstance(self.active_role, set) and user.role in self.active_role,
+            user.role == self.active_role
+        ))
 
     async def start(self, roles, dialogs):
         """
@@ -123,9 +127,6 @@ class BaseStep:
 
         else:
             logger.debug("La commande de jeu '%s' vient d'être invoquée avec succès par %s" % (cmd, author.user.name))
-
-    async def where_cmd(self, args, author, roles, dialogs):
-        print(os.getcwd())
 
     async def skip_cmd(self, args, author, roles, dialogs):
         """ `*skip` : Passe cette étape du jeu. À n'utiliser qu'en cas de problèmes."""

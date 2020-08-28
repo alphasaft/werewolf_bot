@@ -8,7 +8,7 @@ class NicknamesStep(BaseStep):
     def __init__(self):
         BaseStep.__init__(
             self,
-            active_role=None,
+            active_roles=None,
             helps=("Choisissez votre pseudo avec `$nickname monPseudo`, puis blockez le avec `*confirm`",)
         )
         self.waiting_for_nicknames = []

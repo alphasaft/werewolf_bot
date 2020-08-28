@@ -13,7 +13,7 @@ class VoteStep(BaseStep):
 
         BaseStep.__init__(
             self,
-            active_role=None,
+            active_roles=None,
             helps=(
                 "Votez contre un joueur dangereux avec `*vote unJoueur`, ou votez blanc avec `*pass`",
                 "Les villageois votent..."

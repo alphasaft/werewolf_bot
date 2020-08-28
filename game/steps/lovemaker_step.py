@@ -1,13 +1,13 @@
 from .base_step import BaseStep
 from assets.utils import unpack
-from assets.constants import LOVEMAKER
+from assets.constants import LOVEMAKER, WEREWOLF
 
 
 class LoveMakerStep(BaseStep):
     def __init__(self):
         BaseStep.__init__(
             self,
-            active_role=LOVEMAKER,
+            active_roles=LOVEMAKER,
             helps=(
                 "Choisissez deux personnes à faire s'aimer avec `*love joueur1 joueur2`",
                 "Cupidon choisit les amoureux"
@@ -48,6 +48,10 @@ class LoveMakerStep(BaseStep):
         target2.loving = target1
         await target1.user.send(dialogs.lovemaker.in_love.tell(lover=target2_name, role=target2.role.upper()))
         await target2.user.send(dialogs.lovemaker.in_love.tell(lover=target1_name, role=target1.role.upper()))
+        if (target1.role == WEREWOLF) ^ (target2.role == WEREWOLF):
+            await target1.user.send(dialogs.lovemaker.new_goal.tell(lover=target2_name))
+            await target2.user.send(dialogs.lovemaker.new_goal.tell(lover=target1_name))
+
         await self.end(roles, dialogs)
 
     async def end(self, roles, dialogs):

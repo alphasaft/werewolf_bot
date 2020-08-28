@@ -12,11 +12,7 @@ configure_logger(logger)
 BRIEF = """Organise vos parties de jeu"""
 
 FULL = """
-Organise vos parties de jeu.
-Vous devrez tout de même les créer et les rejoindre manuellement avec $game ... (autrement le moindre retard causerait \
-votre exclusion de la partie, ou, au contraire, une longue attente des membres qui ne viendront peut être même pas, \
-mais cette commande vous permet de programmer des parties pour une certaine date, et de vous le rappeler le moment \
-venu, ainsi qu'à vos amis
+Organise vos parties de jeu, vous envoie des rappels et les crée le moment venu.
 
 Tous les "Quand" ci-dessous doivent être remplacés par une date, comme ceci :
     (jour/mois,)heure:minutes OU "today+"jours,heure:minutes
@@ -33,7 +29,7 @@ Aides des commandes:
 -------------------
 
 calendar add Type Nom Quand  ->  Programme un événement de ce type avec ce nom pour cette date. Un seul type \
-                                        ("game") est pour l'instant disponible
+("game") est pour l'instant disponible, ce qui donne donc toujours $calendar add game Nom Quand
 
 calendar subscribe NomDeLEvenement  ->  Vous ajoute à cette partie. Vous en recevrez donc les notifications
 
@@ -145,7 +141,7 @@ def __implement__(bot: GameMaster):
         try:
             bot.check_parameter(name, "$calendar present NomDeLEvenement", "NomDeLEvenement")
             bot.check_event_exists(name)
-            bot.confirm_presence(name, ctx.author.id)
+            await bot.confirm_presence(name, ctx.channel, ctx.author.id)
         except Exception as e:
             await ctx.channel.send(e)
             return

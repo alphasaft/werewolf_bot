@@ -8,6 +8,7 @@ from .villager import Villager
 from .seeker import Seeker
 from .hunter import Hunter
 from .lovemaker import LoveMaker
+from .little_girl import LittleGirl
 
 from .rolegroup import RoleGroup
 from assets.exceptions import CommandPermissionError
@@ -167,6 +168,13 @@ class Roles(dict):
         """Returns the Witch of this game"""
         for r in self.players():
             if isinstance(r, Witch):
+                return r
+
+    @property
+    def little_girl(self):
+        """Returns the LittleGirl of this game"""
+        for r in self.players():
+            if isinstance(r, LittleGirl):
                 return r
 
     def wound(self, name):

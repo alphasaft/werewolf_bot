@@ -10,7 +10,7 @@ class HunterStep(BaseStep):
     def __init__(self):
         BaseStep.__init__(
             self,
-            active_role=HUNTER,
+            active_roles=HUNTER,
             helps=("Utilisez `*kill unJoueur` pour tuer quelqu'un avant votre mort", "Le chasseur décide de sa cible")
         )
 

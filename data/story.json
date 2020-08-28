@@ -98,14 +98,20 @@
         "canceled_vote_by_equality": [
             "{players} ayant \u00e0 plusieurs reprises re\u00e7u autant de votes, le vote est annul\u00e9, afin de ne pas \u00e0 avoir \u00e0 tirer au sort la vie d'une personne, peut-\u00eatre innocente."
         ],
-        "lovers_won": [
-            "{lover1} et {lover2} sont seuls au monde. Ils se regardent, se prennent par la main, et quittent silencieusement ce lieu de mort et de d\u00e9solation, heureux d'\u00eatre \u00e0 deux et en vie.\nLES AMOUREUX ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n"
-        ],
         "werewolf_death_seen_by_villager": [
             "{player} est mort(e) cette nuit. \u00c0 sa carrure forte et muscl\u00e9e, vous voyez qu'il s'agissait d'un loup-garou. Vous poussez un soupir de soulagement ; c'aurait pu \u00eatre l'un des votres..."
         ],
         "villagers_won": [
             "C'\u00e9tait le dernier. Apr\u00e8s de longues nuits blanches, vous avez enfin r\u00e9ussi \u00e0 \u00e9liminer tous les loups-garous !\nLES VILLAGEOIS ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n\n"
+        ],
+        "nobody_won": [
+            "Un silence de mort plane sur ce village, d\u00e9vast\u00e9 par ses luttes internes. Plus tard, ces \u00e9v\u00e9nements d'horreur absolue seront simplement consign\u00e9s par quelques lignes dans les lires d'histoire, mais ils resteront grav\u00e9s dans les souvenirs de ses t\u00e9moins.[TOUT LE MONDE EST MORT, ET PERSONNE N'A GAGN\u00c9 ! VOICI QUELQ \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n"
+        ],
+        "werewolfs_won": [
+            "Ce village ne se rel\u00e8vera pas. Les loups-garou ont massacr\u00e9 tous les habitants, un par un. Mais ils ressentent de la fiert\u00e9, la fiert\u00e9 d'\u00eatre les seuls responsables de ce carnage. Ils le regardent une derni\u00e8re fois, puis s'enfoncent dans la for\u00eat, \u00e0 la recherche de nouvelles proies.\nLES LOUPS-GAROUS ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n"
+        ],
+        "lovers_won": [
+            "{lover1} et {lover2} sont seuls au monde. Ils se regardent, se prennent par la main, et quittent silencieusement ce lieu de mort et de d\u00e9solation, heureux d'\u00eatre \u00e0 deux et en vie.\nLES AMOUREUX ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n"
         ],
         "equality": [
             "{players} sont \u00e0 \u00e9galit\u00e9. Le village d\u00e9cide donc d'organiser un {turn}\u00e8me tour de vote, o\u00f9 vous ne pouvez voter que pour eux"
@@ -157,9 +163,6 @@
         ],
         "has_voted": [
             "{player} a vot\u00e9 contre {target} !"
-        ],
-        "werewolfs_won": [
-            "Ce village ne se rel\u00e8vera pas. Les loups-garou ont massacr\u00e9 tous les habitants, un par un. Mais ils ressentent de la fiert\u00e9, la fiert\u00e9 d'\u00eatre les seuls responsables de ce carnage. Ils le regardent une derni\u00e8re fois, puis s'enfoncent dans la for\u00eat, \u00e0 la recherche de nouvelles proies.\nLES LOUPS-GAROUS ONT GAGN\u00c9 ! VOICI QUELS \u00c9TAIENT LES R\u00d4LES DE LA PARTIE : \n\n{roles}\n"
         ]
     },
     "villager": {
@@ -236,7 +239,10 @@
             "Vous \u00e9tiez l\u00e0 incognito. Vous les avez longtemps observ\u00e9s pour \u00eatre s\u00fbr de votre choix. Maintenant, il est temps de jouer votre r\u00f4le.\n[VOUS \u00caTES CUPIDON. VOUS GAGNEZ SI LES VILLAGEOIS GAGNENT]"
         ],
         "in_love": [
-            "Vous ne pouvez plus vous en emp\u00eacher. Malgr\u00e9 tous les dangers qui r\u00f4dent dehors, vous vous glissez par la porte, et marchez silencieusement vers une maison \u00e0 l'autre bout du village.\n[VOUS \u00caTES AMOUREU(X/SE) DE {lover}, QUI EST {role}. VOTRE NOUVEAU BUT EST QUE VOUS SOYEZ LES SEULS SURVIVANTS]"
+            "Vous ne pouvez plus vous en emp\u00eacher. Malgr\u00e9 tous les dangers qui r\u00f4dent dehors, vous vous glissez par la porte, et marchez silencieusement vers une maison \u00e0 l'autre bout du village.\n[VOUS \u00caTES AMOUREU(X/SE) DE {lover}, QUI EST {role}. LA MORT DE L'UN ENTRAINERA CELLE DE L'AUTRE]"
+        ],
+        "new_goal": [
+            "Jamais les autres n'accepteront votre union avec {lover}. Ni les villageois, ni les loup-garous. Bien s\u00fbr, vous pouvez tenter de leur cacher cela, mais cette s\u00e9curit\u00e9 ne sera qu'illusoire ; non, vous devez faire bande \u00e0 part. \u00catre seuls au monde, et heureux. [VOUS CHANGEZ DE BUT \u00c0 CAUSE DE VOTRE AMOUR INTERDIT AVEC {lover} : VOUS DEVEZ MAINTENANT \u00caTRE LES SEULS SURVIVANTS]"
         ]
     }
 }

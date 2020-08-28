@@ -1,18 +1,1 @@
-<events>
-  <event type="game">
-    <name>Sant&#233;!</name>
-    <home_channel>746683530637213747</home_channel>
-    <date year="2020" month="8" day="28" hour="20" minute="0"/>
-    <members>
-      <member id="709029574863749160" admin="True"/>
-    </members>
-    <remainders>
-      <elem>-180</elem>
-      <elem>-150</elem>
-      <elem>-125</elem>
-      <elem>-115</elem>
-      <elem>-110</elem>
-      <elem>-105</elem>
-    </remainders>
-  </event>
-</events>
+<events/>

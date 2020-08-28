@@ -1,6 +1,6 @@
 from .base_step import BaseStep
 from assets.utils import unpack
-from assets.constants import WEREWOLF
+from assets.constants import WEREWOLF, LITTLE_GIRL
 import assets.messages as msgs
 
 
@@ -10,7 +10,7 @@ class WereWolfsStep(BaseStep):
         self.agree_players = set()
         BaseStep.__init__(
             self,
-            active_role=WEREWOLF,
+            active_roles={WEREWOLF, LITTLE_GIRL},
             helps=(
                 "Proposez une cible avec `*kill uneCible`, ou montrez votre approbation avec `*confirm`",
                 "Les loup-garous choisissent leur prochaine victime..."
@@ -51,6 +51,7 @@ class WereWolfsStep(BaseStep):
         """ `*kill uneCible` : Propose de tuer ce joueur. Si tous les loups sont d'accord, il/elle sera tué(e)"""
         try:
             target = unpack(args, "!kill uneCible")
+            assert author in roles.were_wolfs, "Vous n'êtes pas un loup-garou !"
             roles.check_has_player(target)
             assert roles.get_role_by_name(target) not in roles.were_wolfs, dialogs.werewolf.try_to_kill_werewolf.tell()
         except Exception as e:
@@ -111,6 +112,9 @@ class WereWolfsStep(BaseStep):
             target=self.targeted or "encore personne",
             agree=", ".join(roles.get_role_by_id(w.id) for w in self.agree_players) if self.agree_players else "encore personne"
         ))
+
+    async def spy_cmd(self, args, author, roles, dialogs):
+        ...
 
     async def external_quit_cmd(self, args, author, roles, dialogs, session):
         """ `*quit` : Quitte définitivement la partie """

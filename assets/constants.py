@@ -1,3 +1,5 @@
+from datetime import timezone, timedelta
+
 # Bot settings
 
 PREFIX = '$'
@@ -10,16 +12,17 @@ EVENTS_CHANNEL = 744228828867723476
 EXPEDITIONS_CATEGORY = "EXPEDITIONS"
 BASE_ROLE = "Manant"
 
-_TIMEZONE = 2  # Your time zone here. 2 is UTC+2, -3 UTC-3, etc
-TIMEZONE = _TIMEZONE * 3600
 
+TIMEZONE = timezone(timedelta(hours=2), "France")  # Your time zone here
 
 # Game constants
 
 DIALOGS_PATH = "data/story.json"
 EVENTS_PATH = "data/events.xml"
 MINIMUM_PLAYERS = 4
-ALLTIMES_CMDS = ('admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes', 'again', 'kick')
+ALLTIMES_CMDS = (
+    'admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes', 'again', 'kick', 'skip'
+)
 WHITE_VOTE = "Vote blanc"
 
 
@@ -31,4 +34,5 @@ LOVEMAKER = "cupidon"
 WITCH = "sorcière"
 VILLAGER = "villageois"
 WEREWOLF = "loup-garou"
+LITTLE_GIRL = "petite fille"  # eheh
 

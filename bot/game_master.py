@@ -5,9 +5,13 @@ import datetime
 from .extended_bot import ExtendedBot
 from game import Session, StoryBook, GameEvent, convert_to_datetime, convert_to_str, is_over
 from assets.exceptions import *
-from assets.utils import make_mention
+from assets.utils import make_mention, configure_logger
 import assets.messages as msgs
 import assets.constants as consts
+import assets.logger as logger
+
+
+configure_logger(logger)
 
 
 class _XmlEventsIO(object):
@@ -181,7 +185,7 @@ class GameMaster(ExtendedBot):
 
     def check_has_free_time(self, user_id, when):
         _when = when if isinstance(when, datetime.datetime) else convert_to_datetime(when)
-        for name, event in {name: e for name, e in self.events.items() if _when == e}.items():
+        for name, event in {name: e for name, e in self.events.items() if _when == e.dt}.items():
             if user_id in event.members.keys():
                 raise AvailabilityError(msgs.NO_FREE_TIME % name)
         return True
@@ -236,7 +240,6 @@ class GameMaster(ExtendedBot):
 
     # - - - Game - - -
     def add_game(self, name, admin, home_channel):
-        self.check_name_is_available(name)
         self.games[name] = Session(name, admin, home_channel, self.dialogs)
 
     def delete_game(self, name: str):
@@ -280,8 +283,8 @@ class GameMaster(ExtendedBot):
     def add_event_member(self, name, member):
         self.events[name].add_member(member)
 
-    def confirm_presence(self, name, user_id):
-        self.events[name].confirm_presence(user_id)
+    async def confirm_presence(self, name, where, user_id):
+        await self.events[name].confirm_presence(user_id, where=where, bot=self)
 
     async def activate_events(self):
         for name, event in self.events.copy().items():

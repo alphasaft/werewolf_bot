@@ -7,6 +7,12 @@ import re
 
 from assets.constants import TIMEZONE
 from assets.exceptions import *
+from assets.utils import configure_logger
+import assets.messages as msgs
+import assets.logger as logger
+
+
+configure_logger(logger)
 
 
 # Functions
@@ -34,7 +40,7 @@ def now():
     Returns a datetime.datetime object corresponding to the current date and time, for the given timezone
     (see assets/constants.py)
     """
-    return datetime.datetime.utcfromtimestamp(time.time() + TIMEZONE)
+    return datetime.datetime.fromtimestamp(time.time(), tz=TIMEZONE)
 
 
 def convert_to_datetime(s: str):
@@ -63,8 +69,9 @@ def convert_to_datetime(s: str):
     minute = get('minute')
 
     if forward:
-        dt = datetime.datetime.utcfromtimestamp(
-            time.time() + TIMEZONE + forward * 3600 * 24
+        dt = datetime.datetime.fromtimestamp(
+            time.time() + (forward * 3600 * 24),
+            tz=TIMEZONE
         ).replace(hour=hour, minute=minute)
 
     elif day:
@@ -77,6 +84,7 @@ def convert_to_datetime(s: str):
             day=day,
             hour=hour,
             minute=minute,
+            tzinfo=TIMEZONE
         )
 
     else:
@@ -110,7 +118,7 @@ def clean_str_dt(when):
 class _BaseEvent(object):
     """
     Represents a dated object, also the skeleton of a valid event. Warning, the datetime must have been built using
-    datetime.datetime.utcfromstamp OR with the basic constructor (__init__), else its timestamp is invalid.
+    the correct timezone (use the TIMEZONE constant)
     """
     def __init__(self, dt: datetime.datetime, description):
         self.dt = dt
@@ -195,7 +203,7 @@ class Event(_BaseEvent):
         self.members = {admin.id: admin}
         self.present_members = set()
 
-        _remainders = _remainders or (-60, -30, -5, 5, 10, 15)
+        _remainders = _remainders or (-3, -2, -1, 1, 2, 3)
         self.bef_remainder_desc = bef_remainder_desc
         self.aft_remainder_desc = aft_remainder_desc
         self.bef_remainders = self._get_remainders(self.timestamp(), (r for r in _remainders if r < 0))
@@ -214,7 +222,7 @@ class Event(_BaseEvent):
         remainders = []
         _now = now()
         for remainder in _list:
-            date = datetime.datetime.utcfromtimestamp(initial_stamp + remainder*60)
+            date = datetime.datetime.fromtimestamp(initial_stamp + remainder*60, tz=TIMEZONE)
             if remainder < 0:
                 desc = self.bef_remainder_desc or "Rappel : %s" % self.description
             else:
@@ -239,11 +247,12 @@ class Event(_BaseEvent):
         """Returns the list of the event members"""
         return list(self.members.values())
 
-    def confirm_presence(self, user_id):
+    async def confirm_presence(self, user_id, where, bot):
         """
         Confirm that the user is present for the event.
         It raises a BelongingError if the user doesn't belong to this event or an EventRelatedError in the case the
-        event hasn't yet begin
+        event hasn't yet begin, or if the user ha already confirmed
+        where represents the channel where the user confirmed
         """
         if not self.has_member(user_id):
             raise BelongingError("Vous n'appartenez pas à cet événement !")
@@ -255,6 +264,7 @@ class Event(_BaseEvent):
             raise EventRelatedError("L'événement n'a pas encore commencé !")
 
         self.present_members.add(user_id)
+        await self.on_presence_confirm(bot.get_user(user_id), where, bot)
 
     async def check_and_activate(self, bot):
         """
@@ -276,6 +286,11 @@ class Event(_BaseEvent):
             await self.notify(self.description)
 
     async def activate(self, bot):
+        """Override this to do specific actions when the event is activated"""
+        pass
+
+    async def on_presence_confirm(self, user, where, bot):
+        """Override this to reacts to a user's presence confirmation"""
         pass
 
     async def notify(self, msg):
@@ -287,10 +302,8 @@ class Event(_BaseEvent):
         """Return True if the event is over (the latest Remainder was done), False otherwise"""
         if not self.aft_remainders and now() >= self.dt:
             return True
-
         elif self.aft_remainders and now() >= self.aft_remainders[-1].dt:
             return True
-
         else:
             return False
 
@@ -299,6 +312,7 @@ class Event(_BaseEvent):
 # - - - - - - - - -
 
 class GameEvent(Event):
+    """Represents an event that will automatically create a game when activated"""
     def __init__(self,
                  when,
                  name,
@@ -308,6 +322,9 @@ class GameEvent(Event):
                  ):
 
         self.home_channel = home_channel
+        self.name = name
+        self._admin_joined = False
+
         smiley = ":stuck_out_tongue_closed_eyes:"
         desc = "La partie %s va commencer ! Viens vite !"
         bef_remainder_desc, aft_remainder_desc = (
@@ -317,13 +334,34 @@ class GameEvent(Event):
 
         Event.__init__(
             self,
-            when,
-            desc % name,
+            when=when,
+            description=desc % name,
             admin=admin,
             _remainders=_remainders,
             bef_remainder_desc=bef_remainder_desc % (name, smiley),
             aft_remainder_desc=aft_remainder_desc % (name, smiley)
         )
 
+    @property
+    def game_name(self):
+        return self.name + '-game'
+
     async def activate(self, bot):
-        ...
+        """We create a game that has the same name as the event, and we inform the event members about it"""
+        bot.add_game(self.game_name, self.admin, self.home_channel)
+        await self.home_channel.send(msgs.GAME_CREATED_BY_EVENT % (self.name, self.name))
+
+    async def on_presence_confirm(self, user, where, bot):
+        """
+        We just force the user to join the game, and if he's the admin of the event, we grant him the admin
+        permission for the game too
+        """
+        bot.join_game(self.game_name, user)
+
+        if user == self.admin:
+            self._admin_joined = True
+            bot.set_admin(self.game_name, user.id)
+        elif len(bot.get_game_members(self.game_name)) == 1 and not self._admin_joined:
+            bot.set_admin(self.game_name, user.id)
+
+        await where.send(msgs.GAME_JOINED_BY_EVENT % (self.game_name, self.game_name))

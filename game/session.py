@@ -3,6 +3,7 @@ from time import sleep
 from game.roles import Roles
 from game.steps.steps_list import StepList
 from assets.constants import PREFIX
+from assets.utils import make_mention
 import assets.messages as msgs
 
 
@@ -35,7 +36,7 @@ class Session:
 
     def set_admin(self, player_id: int):
         if not self.players.get(player_id):
-            raise NameError(msgs.FAILED_ADMIN_CHANGE % (player_id, self.name))
+            raise NameError(msgs.FAILED_ADMIN_CHANGE % (make_mention(player_id), self.name))
 
         self.admin = self.players[player_id]
         if self.active:

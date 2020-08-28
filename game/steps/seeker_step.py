@@ -7,7 +7,7 @@ class SeekerStep(BaseStep):
     def __init__(self):
         BaseStep.__init__(
             self,
-            active_role=SEEKER,
+            active_roles=SEEKER,
             helps=(
                 "Choisissez qui vous voulez espionner avec `*see unJoueur`",
                 "La voyante consulte sa boule de cristal"
