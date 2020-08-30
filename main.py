@@ -63,7 +63,7 @@ async def on_message(msg):
         if bot.devmode:
             try:
                 await bot.devtool.process_commands(msg)
-            except:
+            except BaseException:
                 msg = bot.devtool.transform_msg(msg)
                 logger.debug("Message author was truncated for %s" % msg.author.name)
             else:

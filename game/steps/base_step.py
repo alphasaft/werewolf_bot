@@ -1,4 +1,4 @@
-import os
+import traceback
 
 from assets.utils import italic, bold, indented, suppress_markdown, suppress, unpack, configure_logger
 from assets.constants import ALLTIMES_CMDS, PREFIX
@@ -36,7 +36,7 @@ class BaseStep:
 
     @staticmethod
     async def redirect(from_, to, msg):
-        await to.send(italic(suppress_markdown(from_ + ' : ' + str(msg).strip())))
+        await to.send(italic(suppress_markdown(from_ + ' : ' + msg)))
 
     @staticmethod
     async def info(to, msg):
@@ -82,7 +82,7 @@ class BaseStep:
                 await self.error(
                     to=msg.author,
                     msg="Attention ! Ce message ressemble fortement à une commande, et il ne faudrait pas que les "
-                        "autres te surprennent ! [CE MESSAGE N'A PAS ÉTÉ RELAYÉ ; UTILISE $public monMessage SI TU "
+                        "autres te surprennent ! [CE MESSAGE N'A PAS ÉTÉ RELAYÉ ; UTILISE `$public monMessage` SI TU "
                         "VEUX VRAIMENT L'ENVOYER À TOUS LES JOUEURS]"
                 )
             else:
@@ -119,20 +119,39 @@ class BaseStep:
                 await self.command_not_found(cmd, author)
 
         except Exception as e:
-            fmt = "'%s %s' command invocation raised a(n) %s : %s" % (
-                cmd, " ".join(args), e.__class__.__name__, str(e) or "[no further info]"
+            fmt = "'%s %s' command invocation raised a(n) %s :\n\n%s\n%s\n" % (
+                cmd,
+                " ".join(args),
+                e.__class__.__name__,
+                "".join(traceback.format_tb(e.__traceback__)),
+                str(e) or "[no further info]",
             )
+
             logger.error(fmt)
             await self.error(to=author, msg=msgs.COMMAND_HAS_RAISED % cmd)
 
         else:
             logger.debug("La commande de jeu '%s' vient d'être invoquée avec succès par %s" % (cmd, author.user.name))
 
+    async def external_destroy_cmd(self, args, author, roles, dialogs, session):
+        """ `*destroy` : Détruit la partie en expulsant tout ses joueurs. """
+        try:
+            roles.check_is_admin(author)
+            assert not args, msgs.TOO_MUCH_PARAMETERS % ("$destroy", ", ".join(args))
+        except Exception as e:
+            await self.error(to=author, msg=str(e))
+            return
+
+        await self.info(to=roles.everyone, msg=msgs.GAME_DESTROYED % author.user.display_name)
+        for player in session.players.copy().values():
+            session.remove_player(player.id)
+            await BaseStep.end(self, roles, dialogs)
+
     async def skip_cmd(self, args, author, roles, dialogs):
         """ `*skip` : Passe cette étape du jeu. À n'utiliser qu'en cas de problèmes."""
         try:
             assert not args, msgs.TOO_MUCH_PARAMETERS % (", ".join(args), "$skip")
-            roles.check_is_game_admin(author)
+            roles.check_is_admin(author)
         except Exception as e:
             await self.error(to=author, msg=e)
 
@@ -149,15 +168,17 @@ class BaseStep:
     async def private_cmd(self, args, author, roles, dialogs):
         """ `*private unJoueur monMessage` : Envoi le message uniquement à ce joueur """
         try:
-            roles.check_has_player(args[0])
+            target, *msg = unpack(args, "$private unJoueur *monMessage")
+            assert len(args) >= 2, "Il manque un message !"
+            assert roles.get_role_by_name(target), msgs.NO_SUCH_PLAYER % target
         except Exception as e:
             await self.error(to=author, msg=e)
             return
 
         await self.redirect(
             from_=roles.get_name_by_id(author.user.id),
-            to=roles.get_role_by_name(args[0]).user,
-            msg=" ".join(args[1:])
+            to=roles.get_role_by_name(target),
+            msg=" ".join(msg)
         )
 
     async def players_cmd(self, args, author, roles, dialogs):
@@ -202,7 +223,10 @@ class BaseStep:
             else:
                 roles.admin = candidates[0].user
 
-            await self.info(to=author, msg="Votre role d'admin vient d'être transféré à %s" % roles.admin.name)
+            await self.info(
+                to=roles.everyone,
+                msg="Le role d'admin pour cette partie vient d'être transféré à %s :sunglasses:" % roles.admin.name
+            )
 
         await self.info(
             to=roles.everyone,
@@ -217,7 +241,7 @@ class BaseStep:
         """ `*kick unJoueur` : Kick ce joueur de la partie """
         try:
             kicked = unpack(args, '!kick unJoueur')
-            roles.check_is_game_admin(author)
+            roles.check_is_admin(author)
             assert roles.get_role_by_name(kicked), msgs.NO_SUCH_PLAYER % kicked
         except Exception as e:
             await self.error(author.user, str(e))
@@ -225,18 +249,18 @@ class BaseStep:
 
         await self.info(
             to=roles.everyone,
-            msg="%s a été kické(e) de la partie. Il/elle était %s" % (roles.get_name_by_id(author.user.id), author.role)
+            msg="%s a été kické(e) de la partie. Il/elle était %s" % (kicked, roles.get_role_by_name(kicked).role)
         )
 
-        await roles.kill(roles.get_name_by_id(author.id))
-        session.remove_player(author.user.id)
+        await roles.kill(kicked)
+        session.remove_player(roles.get_role_by_name(kicked).id)
         await self.on_player_quit(roles, dialogs)
 
     async def external_admin_cmd(self, args, author, roles, dialogs, session):
         """ `*admin unJoueur` : Change l'administrateur de la partie pour unJoueur """
         try:
             new_admin = unpack(args, '!admin unJoueur')
-            roles.check_is_game_admin(author)
+            roles.check_is_admin(author)
             assert roles.get_role_by_name(new_admin), msgs.NO_SUCH_PLAYER % new_admin
         except Exception as e:
             await self.error(author.user, str(e))
@@ -269,3 +293,13 @@ class BaseStep:
     async def end(self, roles, dialogs):
         """Ends the step. Default is to set self.ended to True"""
         self.ended = True
+
+
+class ReachableStep(BaseStep):
+    """
+    Step that accept to receive new players while running. Herits all the methods of BaseStep, and adds an asynchronous
+    on_player_join method that should be called every time a player joins the game.
+    """
+    async def on_player_join(self, player, roles, dialogs):
+        await self.info(roles.everyone.exclude(player.id), msgs.SOMEONE_JOINED_THE_ACTIVE_GAME % player.display_name)
+        await self.info(player, msgs.ACTIVE_GAME_JOINED)

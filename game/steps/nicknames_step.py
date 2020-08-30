@@ -1,12 +1,12 @@
-from game.steps.base_step import BaseStep
+from game.steps.base_step import ReachableStep
 from game.roles import Roles
 from assets.utils import unpack, block
 import assets.messages as msgs
 
 
-class NicknamesStep(BaseStep):
+class NicknamesStep(ReachableStep):
     def __init__(self):
-        BaseStep.__init__(
+        ReachableStep.__init__(
             self,
             active_roles=None,
             helps=("Choisissez votre pseudo avec `$nickname monPseudo`, puis blockez le avec `*confirm`",)
@@ -25,7 +25,17 @@ class NicknamesStep(BaseStep):
 
     async def on_player_quit(self, roles, dialogs):
         if self.confirmed == roles.everyone or not roles:
-            await BaseStep.end(self, roles, dialogs)
+            await ReachableStep.end(self, roles, dialogs)
+
+    async def on_player_join(self, player, roles, dialogs):
+        await ReachableStep.on_player_join(self, player, roles, dialogs)
+
+        name, role = roles.get_name_by_id(player.id), roles.get_role_by_id(player.id)
+        if not (name.isalnum() and len(name) <= 15 and " " not in name):
+            await role.send(block(msgs.BAD_NAME % name))
+            self.waiting_for_nicknames.append(role)
+        else:
+            await role.send(block(msgs.CHOOSE_NICKNAME % name))
 
     async def nickname_cmd(self, args, author, roles: Roles, dialogs):
         """ `*nickname unPseudo` : Change votre pseudo pour unPseudo """
@@ -74,5 +84,5 @@ class NicknamesStep(BaseStep):
         await roles.everyone.send(embed=msgs.GET_NICKNAMES.build(nicknames=" ,\n- ".join(
                 player.user.mention + ' -> ' + nickname for nickname, player in roles.items()
         )))
-        await BaseStep.end(self, roles, dialogs)
+        await ReachableStep.end(self, roles, dialogs)
 

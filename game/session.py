@@ -1,37 +1,37 @@
 import discord
+
+import assets.messages as msgs
+from assets.constants import PREFIX
+from assets.utils import make_mention, indented, StateOwner
+from assets.exceptions import GameRelatedError
 from time import sleep
 from game.roles import Roles
-from game.steps.steps_list import StepList
-from assets.constants import PREFIX
-from assets.utils import make_mention
-import assets.messages as msgs
+from game.steps import StepList, NicknamesStep
 
 
-class Session:
+class Session(StateOwner):
     def __init__(self, name, admin, home_channel, dialogs):
+        StateOwner.__init__(self)
         self.name = name
-        self.active = False
 
         self.dialogs = dialogs
         self.steps = StepList()
         self.roles = Roles(game_name=name, dialogs=self.dialogs)
 
-        self.players = {}
+        self.players = {admin.id: admin}
         self.admin = admin
         self.home_channel = home_channel
-        self.add_player(admin)
+
+    def active_but_reachable(self):
+        """Returns True if self is active and if the current step defines a "on_player_join" method"""
+        return self.active() and hasattr(self.steps.current_step, "on_player_join")
 
     def force_build(self, players):
-        self.players = {}
-        for player in players:
-            self.add_player(player)
-
-    def add_player(self, new_player: discord.User):
-        self.players[new_player.id] = new_player
+        self.players = {player.id: player for player in players}
 
     def remove_player(self, player_id: int):
         self.players.pop(player_id)
-        if self.active:
+        if self.active():
             self.roles.quit_game(self.roles.get_name_by_id(player_id))
 
     def set_admin(self, player_id: int):
@@ -39,7 +39,7 @@ class Session:
             raise NameError(msgs.FAILED_ADMIN_CHANGE % (make_mention(player_id), self.name))
 
         self.admin = self.players[player_id]
-        if self.active:
+        if self.active():
             self.roles.set_admin(self.roles.get_name_by_id(player_id))
 
     def has_player(self, player_id: str):
@@ -48,20 +48,24 @@ class Session:
     def get_players(self):
         return list(self.players.values())
 
-    @property
-    def ended(self):
-        """Returns self.steps.ended"""
-        return self.steps.ended
+    async def add_player(self, new_player: discord.User):
+        self.players[new_player.id] = new_player
+        if self.active_but_reachable():
+            self.roles.add_player(new_player)
+            await self.steps.current_step.on_player_join(new_player, self.roles, self.dialogs)
+
+    async def notify(self, message):
+        await self.roles.everyone.send(indented(message))
 
     async def launch(self):
-        self.active = True
+        self.set_state("ACTIVE")
         self.steps.__init__()
         self.roles.__init__(self.dialogs, self.name, list(self.players.values()), self.admin)
         await self.steps.current_step.start(self.roles, self.dialogs)
         await self.check_step_continues()
 
     async def react(self, msg):
-        if self.active and self.has_player(msg.author.id):
+        if self.active() and self.has_player(msg.author.id):
             if msg.content.startswith(PREFIX):
                 cmd = msg.content.split()[0][len(PREFIX):]
                 args = msg.content.split()[1:]
@@ -72,9 +76,12 @@ class Session:
             await self.check_step_continues()
 
     async def check_step_continues(self):
-        if self.ended:
+        if self.ended():
             return
 
         while self.steps.current_step.ended:
             sleep(1)
             await self.steps.next_step(self.roles, self.dialogs)
+
+        if self.steps.ended:
+            self.set_state("ENDED")

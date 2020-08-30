@@ -1,4 +1,5 @@
 import discord
+import enum
 import assets.messages as msgs
 import assets.logger as logger
 
@@ -163,13 +164,19 @@ def suppress(string, *substrings):
 
 def unpack(args, expected_syntax):
     expected_syntax = expected_syntax.split(' ')
-    if len(args) < len(expected_syntax)-1:
-        raise SyntaxError(msgs.MISSING_PARAMETER % " ".join(expected_syntax), expected_syntax[len(args)+1][1:-1])
+    if expected_syntax[-1][0] == '*':
+        expected_syntax = expected_syntax[:-1]
+    else:
+        if len(args) > len(expected_syntax)-1:
+            raise SyntaxError(
+                msgs.TOO_MUCH_PARAMETERS % (" ".join(expected_syntax), ", ".join(args[len(expected_syntax)-1:]))
+            )
 
-    elif len(args) > len(expected_syntax)-1:
+    if len(args) < len(expected_syntax)-1:
         raise SyntaxError(
-            msgs.TOO_MUCH_PARAMETERS % " ".join(expected_syntax), ", ".join(args[len(expected_syntax)-1:])
+            msgs.MISSING_PARAMETER.strip() % (" ".join(expected_syntax), expected_syntax[len(args)+1])
         )
+
     return args if len(args) > 1 else args[0]
 
 
@@ -181,3 +188,32 @@ def get_id(m: str):
 def make_mention(u_id: int):
     """Make a discord mention with an user id"""
     return "<@"+str(u_id)+">"
+
+
+class State(enum.Enum):
+    """Represents the state of a game, a step etc"""
+    OFF = 0
+    ACTIVE = 1
+    ENDED = 2
+
+
+class StateOwner:
+    """
+    Defines the methods off, active and ended for the class, that return True if the class
+    instance.state == State.OFF, State.ACTIVE or State.ENDED
+    """
+    def __init__(self, state: str = "OFF"):
+        self._state = None
+        self.set_state(state)
+
+    def off(self):
+        return self._state == State.OFF
+
+    def active(self):
+        return self._state == State.ACTIVE
+
+    def ended(self):
+        return self._state == State.ENDED
+
+    def set_state(self, state: str):
+        self._state = getattr(State, state)

@@ -54,29 +54,29 @@ class _EmbedSkeleton:
 # --- Global ---
 
 MISSING_PARAMETER = """
-Syntaxe attendue : %s, paramêtre %s manquant
+La commande s'écrit comme suit : %s, il manque l'information suivante : %s
 """
 
 
 TOO_MUCH_PARAMETERS = """
-Syntaxe attendue : %s, le(s) paramêtre(s) '%s' sont en trop
+La commande s'écrit comme suit : %s, la/les chose(s) suivante(s) sont en trop : %s
 """
 
 
 MISSING_PERMISSIONS = """
-Erreur : Il vous manque la/les permission(s) %s pour la partie %s pour faire cela. 
+Il vous manque la/les permission(s) %s pour la partie %s pour faire cela. 
 """
 
 WRONG_GAME_NAME = """
-Erreur : la partie %s n'existe pas
+la partie %s n'existe pas
 """
 
 NO_GAME_JOINED = """
-Erreur : L'utilisateur %s n'a pas rejoint %s.
+L'utilisateur %s n'a pas rejoint %s.
 """
 
 ALREADY_WAITING = """
-Erreur :  Déjà en attente d'une confirmation pour la commande %s
+ Déjà en attente d'une confirmation pour la commande %s
 """
 
 WELCOME = """
@@ -368,6 +368,18 @@ GET_ROLE = """Vous êtes %s"""
 
 # --- GAME ---
 
+SOMEONE_JOINED_THE_ACTIVE_GAME = """
+%s vient de rejoindre la partie ! 
+"""
+
+ACTIVE_GAME_JOINED = """
+Vous venez de rejoindre un jeu déjà en cours ; amusez-vous !
+"""
+
+GAME_DESTROYED = """
+%s vient de détruire la partie !
+"""
+
 NO_SUCH_PLAYER = """
 Le joueur %s n'existe pas, ou il n'habite pas dans ce village
 """
@@ -425,7 +437,7 @@ confirmer ta présence et la rejoindre au passage !
 
 GAME_JOINED_BY_EVENT = """
 Vous venez de rejoindre la partie-événement %s ! Pour lancer des commandes en rapport avec cette partie, tapez par
-exemple $game members %s, sans oublier le "-game"
+exemple $game members %s, sans oublier le '.' au début !
 """
 
 # --- Game beginner's guide ---

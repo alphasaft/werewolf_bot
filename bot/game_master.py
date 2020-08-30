@@ -5,7 +5,7 @@ import datetime
 from .extended_bot import ExtendedBot
 from game import Session, StoryBook, GameEvent, convert_to_datetime, convert_to_str, is_over
 from assets.exceptions import *
-from assets.utils import make_mention, configure_logger
+from assets.utils import make_mention, configure_logger, StateOwner
 import assets.messages as msgs
 import assets.constants as consts
 import assets.logger as logger
@@ -180,7 +180,7 @@ class GameMaster(ExtendedBot):
             raise GameRelatedError(msgs.MISSING_PLAYERS % (name, players))
 
     def check_game_is_available(self, name: str):
-        if self.games[name].active:
+        if not (self.games[name].off() or self.games[name].active_but_reachable()):
             raise GameRelatedError(msgs.GAME_NOT_AVAILABLE % name)
 
     def check_has_free_time(self, user_id, when):
@@ -204,7 +204,7 @@ class GameMaster(ExtendedBot):
 
     # - - - Info - - -
     def is_active(self, game):
-        if self.games[game].active:
+        if self.games[game].active():
             return True
         else:
             return False
@@ -223,8 +223,14 @@ class GameMaster(ExtendedBot):
     def get_games(self):
         return list(self.games.keys())
 
+    def get_game(self, name):
+        return self.games[name]
+
+    def get_event(self, name):
+        return self.events[name]
+
     def get_opened_games(self):
-        return [name for name, g in self.games.items() if not g.active]
+        return [name for name in self.games.keys() if self.is_active(name)]
 
     def get_opened_events(self):
         return [(name, event.dt) for name, event in self.events.items()]
@@ -245,27 +251,27 @@ class GameMaster(ExtendedBot):
     def delete_game(self, name: str):
         del self.games[name]
 
-    def join_game(self, name: str, user: discord.User):
-        self.games[name].add_player(user)
-
     def quit_game(self, user_id: str):
         self.games[self.which_game(user_id)].remove_player(user_id)
 
     def set_admin(self, name: str, user_id: str):
         self.games[name].set_admin(user_id)
 
+    async def join_game(self, name: str, user: discord.User):
+        await self.games[name].add_player(user)
+
     async def launch_game(self, name: str):
         await self.games[name].launch()
-        if self.games[name].ended:  # Means the game has ended
+        if self.games[name].ended():
             await self.voice_channels.pop(name).delete()
             self.games.pop(name)
 
     async def react(self, msg):
         for name, game in self.games.copy().items():
-            if game.has_player(msg.author.id) and game.active:
+            if game.has_player(msg.author.id) and game.active():
                 await game.react(msg)
 
-                if game.ended:
+                if game.ended():
                     await self.voice_channels.pop(name).delete()
                     self.games.pop(name)
                     await game.home_channel.send(msgs.GAME_HAS_ENDED % name)

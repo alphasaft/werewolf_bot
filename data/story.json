@@ -87,7 +87,7 @@
             "Les r\u00e8gles sont claires : vous devez voter pour {authorized_targets}, et vous n'\u00eates pas s\u00fbr que votre vote soit pris en compte si vous faites autrement."
         ],
         "vote_begins": [
-            "Apr\u00e8s les \u00e9venements de cette nuit, la plupart des villageois du village d\u00e9cident de voter, afin d'\u00e9liminer quelqu'un qu'ils soupconnent d'\u00eatre un loup-garou. Ceci \u00e9tant \u00e9galement pour les loup-garous l'occasion d'\u00e9liminer quelques villageois de fa\u00e7on tout ce qu'il y a de plus l\u00e9gal, ils acceptent \u00e9galement, et tout le village se r\u00e9unit. [UTILISEZ $vote <joueur> POUR VOTER, $votes POUR CONSULTER LES VOTES, OU $pass POUR VOTER BLANC.] "
+            "Apr\u00e8s les \u00e9venements de cette nuit, la plupart des villageois du village d\u00e9cident de voter, afin d'\u00e9liminer quelqu'un qu'ils soupconnent d'\u00eatre un loup-garou. Ceci \u00e9tant \u00e9galement pour les loup-garous l'occasion d'\u00e9liminer quelques villageois de fa\u00e7on tout ce qu'il y a de plus l\u00e9gal, ils acceptent \u00e9galement, et tout le village se r\u00e9unit. [UTILISEZ $vote unJoueur POUR VOTER, $votes POUR CONSULTER LES VOTES, OU $pass POUR VOTER BLANC.] "
         ],
         "player_was_killed_by_vote": [
             "{player} se d\u00e9bat, argumente, crie puis enfin se r\u00e9soud \u00e0 \u00eatre tu\u00e9(e). Vous l'emmenez au milieu de la place pour en finir : il/elle \u00e9tait {role}"

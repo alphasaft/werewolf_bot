@@ -1,4 +1,5 @@
 from datetime import timezone, timedelta
+from enum import Enum
 
 # Bot settings
 
@@ -21,7 +22,8 @@ DIALOGS_PATH = "data/story.json"
 EVENTS_PATH = "data/events.xml"
 MINIMUM_PLAYERS = 4
 ALLTIMES_CMDS = (
-    'admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes', 'again', 'kick', 'skip'
+    'admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes', 'again', 'kick', 'skip',
+    'destroy',
 )
 WHITE_VOTE = "Vote blanc"
 

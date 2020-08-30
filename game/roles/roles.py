@@ -27,33 +27,44 @@ class Roles(dict):
         if players:
             self.build(players, admin)
 
-    def build(self, players: list, admin):
+    def __repr__(self):
+        return "<Roles : %s>" % ", ".join(name + ' -> ' + user.role.title() for name, user in self.items())
+
+    def build(self, players: list, admin, nicknames=None):
         shuffle(players)
         self.admin = admin
-        self._set_roles(players)
+        self._set_roles(players, nicknames=nicknames)
 
-    def _set_roles(self, players: list):
+    def _set_roles(self, players: list, nicknames=None):
         max_were_wolfs = (len(players) // 5) + 1
+        nicknames = nicknames or {}
 
-        def set_role(_player, role, dialogs):
-            if self.get(_player.name):
-                self[_player.__str__()] = role(_player, dialogs)  # discord.User.__str__ returns name#discriminator
+        def set_role(_player, role):
+            if nicknames.get(_player.id):
+                self[nicknames[_player.id]] = role(_player, self.dialogs)
+            elif self.get(_player.name):
+                self[_player.__str__()] = role(_player, self.dialogs)  # discord.User.__str__ returns name#discriminator
             else:
-                self[_player.name] = role(_player, dialogs)
+                self[_player.name] = role(_player, self.dialogs)
 
         for i, player in enumerate(players):
             if i < max_were_wolfs:
-                set_role(player, WereWolf, self.dialogs)
+                set_role(player, WereWolf)
             elif i == max_were_wolfs:
-                set_role(player, Seeker, self.dialogs)
+                set_role(player, Seeker)
             elif i == max_were_wolfs + 1:
-                set_role(player, Witch, self.dialogs)
+                set_role(player, Witch)
             elif i == max_were_wolfs + 2:
-                set_role(player, LoveMaker, self.dialogs)
+                set_role(player, LoveMaker)
             elif i == max_were_wolfs + 3:
-                set_role(player, Hunter, self.dialogs)
+                set_role(player, Hunter)
             else:
-                set_role(player, Villager, self.dialogs)
+                set_role(player, Villager)
+
+    def add_player(self, player):
+        nicknames = {p.id: n for n, p in self.items()}  # We save the nicknames
+        users = [r.user for r in self.players()] + [player]
+        self.build(users, self.admin, nicknames=nicknames)
 
     def nicknames(self):
         return list(self.keys())

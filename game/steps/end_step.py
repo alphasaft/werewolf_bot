@@ -40,11 +40,15 @@ class EndStep(BaseStep):
 
         await roles.everyone.send(dialogs.everyone.game_ended.tell())
 
+    async def on_player_join(self, player, roles, dialogs):
+        await self.info(roles.everyone.exclude(player.id), msgs.SOMEONE_JOINED_THE_ACTIVE_GAME % player.display_name)
+        await self.info(player, msgs.ACTIVE_GAME_JOINED)
+
     async def external_again_cmd(self, args, author, roles, dialogs, session: Session):
         """ `*again` : Démarre une nouvelle partie """
         try:
             assert not args, msgs.TOO_MUCH_PARAMETERS % ("again", ", ".join(args))
-            roles.check_is_game_admin(author)
+            roles.check_is_admin(author)
             assert len(session.players) >= MINIMUM_PLAYERS, "Il n'y a plus assez de joueurs !"
         except Exception as e:
             await self.error(to=author, msg=e)

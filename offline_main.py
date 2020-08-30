@@ -72,7 +72,7 @@ class OfflineBotDmChannels:
     def send(self, msg, **kwargs):
         """Sends the message MSG only if MSG.author == self.logged_user"""
         if msg.author == self.logged_user:
-            print("<To %s> %s" % msg.author, msg.content)
+            print("<To %s> %s" % (msg.author, msg.content))
 
     def process_command(self, msg):
         """

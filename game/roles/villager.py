@@ -11,7 +11,7 @@ class Villager:
         self.dialogs = dialogs
         self.role = role
 
-    def __str__(self):
+    def __repr__(self):
         return '< %s : %s >' % (self.user.mention, type(self).__name__)
 
     def __eq__(self, other):

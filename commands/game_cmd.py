@@ -60,7 +60,8 @@ def __implement__(bot: GameMaster):
             await ctx.channel.send(e)
             return
 
-        bot.join_game(game_name, ctx.author)
+        await bot.join_game(game_name, ctx.author)
+
         logger.info("%s joined the game named %s " % (ctx.author.name, game_name))
         await ctx.channel.send(msgs.SUCCESSFULLY_JOINED % game_name)
 
@@ -180,7 +181,7 @@ def __implement__(bot: GameMaster):
             )
             members = [member.mention for member in bot.get_game_members(game_name)]
             await bot.launch_game(game_name)
-            logger.info("Game %s was started by its owner %s" % (ctx.author.name, game_name))
+            logger.info("Game %s was started by its owner %s" % (game_name, ctx.author.name))
             await ctx.channel.send(embed=msgs.GAME_START.build(members="\n- ".join(members)))
 
 

@@ -89,11 +89,11 @@ class VoteStep(BaseStep):
         ))))
 
     async def voteforall_cmd(self, args, author, roles, dialogs):
-        """ `*voteforall unJoueur : Force tous les joueurs à votre contre ce joueur"""
+        """ `*voteforall unJoueur : Force tous les joueurs à voter contre ce joueur"""
         try:
             target = unpack(args, "!voteforall unJoueur")
             roles.check_has_player(target)
-            roles.check_is_game_admin(author)
+            roles.check_is_admin(author)
         except Exception as e:
             await self.error(to=author, msg=e)
             return

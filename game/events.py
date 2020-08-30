@@ -344,7 +344,7 @@ class GameEvent(Event):
 
     @property
     def game_name(self):
-        return self.name + '-game'
+        return '.'+self.name
 
     async def activate(self, bot):
         """We create a game that has the same name as the event, and we inform the event members about it"""

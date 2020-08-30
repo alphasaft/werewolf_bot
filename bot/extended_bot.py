@@ -64,7 +64,7 @@ class ExtendedBot(Bot):
             return ret
 
         except KeyError:
-            await message.channel.send("Erreur : la commande %s n'existe pas." % message.content.split()[0][1:])
+            await message.channel.send("la commande %s n'existe pas." % message.content.split()[0][1:])
 
         except TransformationError as e:
             await message.channel.send(str(e))
@@ -111,4 +111,4 @@ class ExtendedBot(Bot):
     def check_not_too_much_parameters(too_much, expected_syntax):
         """Checks that too_much is empty or None, else raises a ValueError."""
         if too_much:
-            raise CommandSyntaxError(msgs.TOO_MUCH_PARAMETERS % expected_syntax, "', '".join(too_much))
+            raise CommandSyntaxError(msgs.TOO_MUCH_PARAMETERS % (expected_syntax, "', '".join(too_much)))
