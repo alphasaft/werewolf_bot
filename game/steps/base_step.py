@@ -1,7 +1,8 @@
 import traceback
 
+
 from assets.utils import italic, bold, indented, suppress_markdown, suppress, unpack, configure_logger
-from assets.constants import ALLTIMES_CMDS, PREFIX
+from assets.constants import ALLTIMES_CMDS, PREFIX, IDIOT
 import assets.logger as logger
 import assets.messages as msgs
 
@@ -43,6 +44,7 @@ class BaseStep:
         await to.send(indented(suppress_markdown(str(msg).strip())))
 
     def is_current_role(self, user):
+        """Returns True if the user should do an action now, False if he's passive for this step"""
         return any((
             not self.active_role,
             isinstance(self.active_role, set) and user.role in self.active_role,
@@ -71,13 +73,14 @@ class BaseStep:
         this sends the message to correct players ; for example, a message from a were-wolf will only be redirected to
         other were-wolfs.
 
-        If MSG looks like a command where "$" where omitted, warn the user and doesn't redirect the message.
+        If MSG looks like a command where "$" where omitted, warn the user and doesn't redire$ct the message.
         Default redirection is everyone.
         """
         try:
-            if (self.active_role and
+            if (
+                self.active_role and
                 roles.get_role_by_id(msg.author.id).role == self.active_role and
-                (hasattr(self, msg.content.strip().split()[0]+'_cmd'))
+                len(msg.content) > 0 or hasattr(self, msg.content.strip().split()[0]+'_cmd')
             ):
                 await self.error(
                     to=msg.author,
@@ -189,6 +192,7 @@ class BaseStep:
                     player.user.mention,
                     nickname,
                     (
+                        "idiot du village, vivant" if player.role == IDIOT and player.alive and not player.injured else
                         "vivant(e)" if not player.injured and player.alive else
                         "mort(e)" if player.injured and player.alive else
                         player.role

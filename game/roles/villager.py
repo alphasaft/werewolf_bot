@@ -6,6 +6,7 @@ class Villager:
         self.loving = None
         self.alive = True
         self.injured = False
+        self.protected = False
 
         self.user = user
         self.dialogs = dialogs

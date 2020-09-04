@@ -17,6 +17,7 @@ class StepList:
         ]
         self._turn = [  # A turn : vote, witch, were-wolfs...
             game.steps.seeker_step.SeekerStep(),
+            game.steps.guard_step.GuardStep(),
             game.steps.werewolfs_step.WereWolfsStep(),
             game.steps.witch_step.WitchStep(),
             game.steps.death_summary_step.DeathSummaryStep(),

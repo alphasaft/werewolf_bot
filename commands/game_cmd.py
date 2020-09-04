@@ -45,7 +45,7 @@ def __implement__(bot: GameMaster):
             return
 
         bot.add_game(game_name, ctx.author, home_channel=ctx.channel)
-        logger.info("%s created a game named %s" % (ctx.author.name, game_name))
+        logger.debug("%s created a game named %s" % (ctx.author.name, game_name))
         await ctx.channel.send(msgs.SUCCESSFULLY_CREATED % (game_name, game_name))
 
     # Join a game session
@@ -62,7 +62,7 @@ def __implement__(bot: GameMaster):
 
         await bot.join_game(game_name, ctx.author)
 
-        logger.info("%s joined the game named %s " % (ctx.author.name, game_name))
+        logger.debug("%s joined the game named %s " % (ctx.author.name, game_name))
         await ctx.channel.send(msgs.SUCCESSFULLY_JOINED % game_name)
 
     # Change the admin of a game session
@@ -104,12 +104,12 @@ def __implement__(bot: GameMaster):
 
             elif confirm:
                 bot.delete_game(game_name)
-                logger.info("Game %s was deleted by its owner %s" % (game_name, ctx.author.name))
+                logger.debug("Game %s was deleted by its owner %s" % (game_name, ctx.author.name))
                 await ctx.channel.send(msgs.GAME_SUCCESSFULLY_DELETED % game_name)
 
         else:
             bot.quit_game(ctx.author.id)
-            logger.info("%s quited the game %s" % (ctx.author.name, bot.which_game(ctx.author.id)))
+            logger.debug("%s quited the game %s" % (ctx.author.name, bot.which_game(ctx.author.id)))
             await ctx.channel.send(msgs.GAME_SUCCESSFULLY_QUITED % game_name)
 
     # Kick a player from your game
@@ -127,10 +127,10 @@ def __implement__(bot: GameMaster):
             await ctx.channel.send(e)
             return
 
-        game = bot.which_game(player)
+        _game = bot.which_game(player)
         bot.quit_game(player)
-        logger.info("%s was kicked of the game %s" % (ctx.author.name, bot.which_game(ctx.author.id)))
-        await ctx.channel.send(msgs.SUCCESSFULLY_KICKED_FROM_GAME % (make_mention(player), game))
+        logger.debug("%s was kicked of the game %s" % (ctx.author.name, bot.which_game(ctx.author.id)))
+        await ctx.channel.send(msgs.SUCCESSFULLY_KICKED_FROM_GAME % (make_mention(player), _game))
 
     # Get the list of the available games
     @game.command(name='list')
@@ -140,6 +140,8 @@ def __implement__(bot: GameMaster):
             await ctx.channel.send(embed=msgs.OPENED_GAMES_LIST.build(games="\n- ".join(games)))
         else:
             await ctx.channel.send(embed=msgs.NO_OPENED_GAME.build())
+            
+        logger.debug("Error")
 
     # Get the members of a game
     @game.command(name='members')
@@ -181,7 +183,7 @@ def __implement__(bot: GameMaster):
             )
             members = [member.mention for member in bot.get_game_members(game_name)]
             await bot.launch_game(game_name)
-            logger.info("Game %s was started by its owner %s" % (game_name, ctx.author.name))
+            logger.debug("Game %s was started by its owner %s" % (game_name, ctx.author.name))
             await ctx.channel.send(embed=msgs.GAME_START.build(members="\n- ".join(members)))
 
 

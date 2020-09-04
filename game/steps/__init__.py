@@ -9,6 +9,7 @@ from game.steps.dusk_step import DuskStep
 
 from game.steps.lovemaker_step import LoveMakerStep
 from game.steps.seeker_step import SeekerStep
+from game.steps.guard_step import GuardStep
 from game.steps.werewolfs_step import WereWolfsStep
 from game.steps.witch_step import WitchStep
 from game.steps.hunter_step import HunterStep

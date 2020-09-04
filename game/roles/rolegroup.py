@@ -1,3 +1,6 @@
+import random
+
+
 class RoleGroup(set):
     def __init__(self, roles):
         set.__init__(self, roles)
@@ -11,17 +14,23 @@ class RoleGroup(set):
 
         return set.__eq__(self, other)
 
-    def exclude(self, *player_ids):
-        for _id in player_ids:
-            self.remove(self.get_player(_id))
-        return self
-
     def contains_player(self, player_id):
         try:
             self.get_player(player_id)
             return True
         except KeyError:
             return False
+
+    def get_player(self, player_id):
+        for role in self.copy():
+            if role.user.id == player_id:
+                return role
+        raise KeyError("Cannot find a player with id %i" % player_id)
+
+    def exclude(self, *player_ids):
+        for _id in player_ids:
+            self.remove(self.get_player(_id))
+        return self
 
     def players(self):
         return [role.user for role in self]
@@ -32,12 +41,9 @@ class RoleGroup(set):
                 self.exclude(player.id)
         return self
 
+    def random(self):
+        return random.choice(list(self))
+
     async def send(self, content=None, **kwargs):
         for role in self:
             await role.user.send(content=content, **kwargs)
-
-    def get_player(self, player_id):
-        for role in self.copy():
-            if role.user.id == player_id:
-                return role
-        raise KeyError("Cannot find a player with id %i" % player_id)

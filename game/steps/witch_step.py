@@ -1,6 +1,7 @@
 from .base_step import BaseStep
 from assets.utils import unpack
 from assets.constants import WITCH
+from assets.exceptions import ProtectedPlayer
 
 
 class WitchStep(BaseStep):
@@ -32,7 +33,7 @@ class WitchStep(BaseStep):
             ))
         else:
             await roles.witch.user.send(dialogs.witch.turn.tell(
-                 killed_players=", ".join(name for name, player in roles.items() if player.injured and not player == roles.witch and player.alive) or "personne",
+                 killed_players=", ".join(name for name, player in roles.items() if player.injured and not player == roles.witch and player.alive) or "[Personne]",
                  death_potion=str(roles.witch.death_potion),
                  resurrect_potion=str(roles.witch.resurrect_potion)
             ))
@@ -54,8 +55,11 @@ class WitchStep(BaseStep):
             return
 
         author.use_death_potion()
-        roles.wound(target)
-        await roles.witch.user.send(dialogs.witch.kill.tell(target=target))
+        try:
+            roles.wound(target)
+            await roles.witch.send(dialogs.witch.kill.tell(target=target))
+        except ProtectedPlayer:
+            await roles.witch.send(dialogs.witch.target_protected.tell(target=target))
         await self.end(roles, dialogs)
 
     async def resurrect_cmd(self, args, author, roles, dialogs):

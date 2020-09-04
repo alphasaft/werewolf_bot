@@ -36,5 +36,8 @@ class DeathSummaryStep(BaseStep):
                         dialogs.everyone.villager_death_seen_by_werewolf.tell(player=player_name, role=role.role)
                     )
 
+        for role in roles.everyone:
+            role.protected = False
+
         await roles.kill_injured_players()
         await self.end(roles, dialogs)

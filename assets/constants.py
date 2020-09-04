@@ -36,5 +36,7 @@ LOVEMAKER = "cupidon"
 WITCH = "sorcière"
 VILLAGER = "villageois"
 WEREWOLF = "loup-garou"
-LITTLE_GIRL = "petite fille"  # eheh
+LITTLE_GIRL = "petite fille"
+GUARD = "garde"
+IDIOT = "idiot du village"
 

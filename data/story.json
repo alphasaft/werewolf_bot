@@ -16,8 +16,8 @@
         "resurrect_herself": [
             "Vous vous jetez sur votre potion de vie, ouvrez son goulot et en avalez le contenu avant qu'il soit trop tard."
         ],
-        "empty_resurrect_potion": [
-            "Vous \u00eates prise de sueurs froides. La fiole vide dans vos mains vous rappelle \u00e0 quel point vous \u00eates vuln\u00e9rable, sans vos potions."
+        "target_protected": [
+            "Alors que vous vous approchez de la maison de {target} pour lui faire boire la potion qui mettra fin \u00e0 ses jours, vous \u00eates intercept\u00e9 par le garde, lourdement arm\u00e9. Alors que vous tentez de lui expliquer que non, cette potion n'est pas dangereuse, il vous force \u00e0 retourner chez vous, en prenant votre potion au passage. La d\u00e9sagr\u00e9able sensation d'avoir \u00e9chou\u00e9 vous parcourt violement. [VOTRE CIBLE \u00c9TAIT PROT\u00c9G\u00c9E, VOUS N'AVEZ RIEN PU FAIRE...]"
         ],
         "resurrect": [
             "Vous courez aussi vite que vous le pouvez vers {target}. Vous portez la potion d'un bleu vif \u00e0 ses l\u00e8vres, et regardez la magie op\u00e9rer."
@@ -39,6 +39,9 @@
         ],
         "empty_death_potion": [
             "Vous n'oterez la vie \u00e0 personne ce soir ; votre fiole de mort est vide, et vous avez oubli\u00e9 d'en pr\u00e9parer une seconde dose."
+        ],
+        "empty_resurrect_potion": [
+            "Vous \u00eates prise de sueurs froides. La fiole vide dans vos mains vous rappelle \u00e0 quel point vous \u00eates vuln\u00e9rable, sans vos potions."
         ]
     },
     "werewolf": {
@@ -80,6 +83,9 @@
         ],
         "get_target_proposition": [
             "{from_player} vous fait signe. Depuis quelques jours, {target} a un comportement suspect. Peut-\u00eatre vaudrait-il mieux... \u00e9liminer la menace ? D\u00e9finitivement ?"
+        ],
+        "target_protected": [
+            "Vous approchez silencieusement de la maison de {target}. Vous apercevez soudain une silhouette massive devant la porte d'entr\u00e9e, et vous d\u00e9cidez d'abandonner vos plans initiaux. Vous avez besoin de votre dose de chair fra\u00eeche, mais rien n'assure que vous sortirez vivant d'un combat avec le Garde. [VOTRE CIBLE \u00c9TAIT PROT\u00c9G\u00c9E, VOUS N'AVEZ RIEN PU FAIRE...]"
         ]
     },
     "everyone": {
@@ -243,6 +249,69 @@
         ],
         "new_goal": [
             "Jamais les autres n'accepteront votre union avec {lover}. Ni les villageois, ni les loup-garous. Bien s\u00fbr, vous pouvez tenter de leur cacher cela, mais cette s\u00e9curit\u00e9 ne sera qu'illusoire ; non, vous devez faire bande \u00e0 part. \u00catre seuls au monde, et heureux. [VOUS CHANGEZ DE BUT \u00c0 CAUSE DE VOTRE AMOUR INTERDIT AVEC {lover} : VOUS DEVEZ MAINTENANT \u00caTRE LES SEULS SURVIVANTS]"
+        ]
+    },
+    "little_girl": {
+        "tell_role": [
+            "Vous vous r\u00e9veillez en sursaut, en sueur \u00e0 cause d'un horrible cauchemar. Vous entendez des pas lourds l\u00e0 dehors, des hurlements \u00e0 la lune et des cris. Vous sortez pour voir ce qui se trame, votre petite taille jouant en votre faveur... si vous n'\u00eates pas rep\u00e9r\u00e9e.\n[VOUS \u00caTES LA PETITE FILLE. VOUS GAGNEZ SI TOUS LES LOUP-GAROUS MEURENT, LOUP-GAROUS QUE VOUS POUVEZ ESPIONNER !]"
+        ],
+        "turn": [
+            "Les loup-garous sont de sortie ! Essayez de les espionner avec $spy, mais attention : plus vous utilisez cette commande, plus vous risquez de vous faire prendre..."
+        ],
+        "werewolf_already_seen": [
+            "Vous avez d\u00e9j\u00e0 d\u00e9couvert l'identit\u00e9 d'un loup-garou, et mieux vaut ne pas abuser de votre chance en tentant le diable..."
+        ],
+        "already_caught": [
+            "Vous avez d\u00e9j\u00e0 \u00e9t\u00e9 pris la main dans le sac, et vous \u00eates trop terroris\u00e9 par le fait de revoir ces monstres pour repointer votre nez dehors. Vous n'avez plus qu'\u00e0 attendre et croiser les doigts."
+        ],
+        "werewolf_seen": [
+            "Au d\u00e9tour d'une rue, vous surprenez une ombre massive glissant sur les murs. Vous la suivez furitivement jusqu'\u00e0 apercevoir son possesseur. Malgr\u00e9 ses traits chang\u00e9s sous l'epaisse couche de poils hirsutes, il vous semble reconna\u00eetre {werewolf}."
+        ],
+        "nothing_happens": [
+            "Vous avez beau chercher partout, aucune trace de ces choses qui mettent votre village \u00e0 feu et \u00e0 sang. Peut-\u00eatre devriez-vous continuer \u00e0 chercher, au risque de vous faire prendre ?"
+        ],
+        "caught_red_handed": [
+            "Horreur. Vous n'en \u00eates pas s\u00fbr, mais il vous semble qu'un loup-garou muscl\u00e9 et terrifiant a crois\u00e9 votre regard. Nulle doute qu'il vous a vu. Vous retenez votre souffle, en esp\u00e9rant que cette nuit ne soit pas votre derni\u00e8re."
+        ],
+        "little_girl_caught": [
+            "Une ombre passe furtivement derri\u00e8re un mur. Le temps semble se suspendre tandis que vous analysez son visage, t\u00e9nu et minuscule dans les ten\u00e8bres environnantes. Aucun doute, il s'agissait de {little_girl}. \u00c7a ne vous r\u00e9jou\u00eft pas vraiment de la tuer si jeune, mais vous devez \u00e0 tout prix emp\u00eacher qu'elle rameute tout le village."
+        ]
+    },
+    "guard": {
+        "tell_role": [
+            "Vous vous tournez vers votre armure et l'enfilez dans un fracas m\u00e9talique, puis vous saisissez votre ep\u00e9e par le manche, et vous dirigez vers l'entr\u00e9e de votre maison. Arm\u00e9 comme vous l'\u00eates, vous ne courrez aucun risque. Les autres, si. [VOUS \u00caTES LE GARDE. VOUS GAGNEZ SI TOUS LES VILLAGEOIS GAGNENT, ET POUVEZ PROT\u00c9GER QUELQU'UN CHAQUE NUIT]"
+        ],
+        "wakes_up": [
+            "Le garde sort de sa maison dans un l\u00e9ger cliquetis m\u00e9tallique. Il s'enfonce dans les ombres du village, d\u00e9termin\u00e9 \u00e0 sauver une vie."
+        ],
+        "turn": [
+            "Utilisez $protect unJoueur pour prot\u00e9ger le joueur de votre choix, ou $pass pour ne prot\u00e9ger personne."
+        ],
+        "do_nothing": [
+            "Vous pensez que personne ici n'a besoin d'\u00eatre prot\u00e9g\u00e9 ce soir - ou peut \u00eatre m\u00eame qu'il ne faut surtout pas les prot\u00e9ger."
+        ],
+        "done": [
+            "Vous vous installez devant la maison de {target}. Il/elle ne mourra pas cette nuit. Pas avec vous."
+        ],
+        "go_to_sleep": [
+            "Vous entendez un m\u00e9lange de sifflements d'\u00e9p\u00e9e, de cris et de hurlements bestiaux au loin. Le garde est bien arriv\u00e9 l\u00e0 o\u00f9 il voulait se rendre, pour le meilleur et pour le pire."
+        ],
+        "same_target": [
+            "Vous vous dites qu'il y a peu de chances que les loup-garous choisissent comme victime {target}, que vouss venez de prot\u00e9ger la nuit derni\u00e8re. Vous d\u00e9cidez de choisir quelu'un d'autre"
+        ],
+        "try_to_protect_himself": [
+            "C'est stupide. Si vous vouliez vous prot\u00e9ger vous-m\u00eame, vous auriez mieux fait de vous barricader chez vous..."
+        ]
+    },
+    "idiot": {
+        "tell_role": [
+            "Vous ne vous pr\u00e9occupez de rien. Ces histoires de loup-garous vont bien finir par se r\u00e9soudre toutes seules ! Le seul risque que vous courrez serait de vous faire tuer lors du vote quotidien, mais vous n'avez jamais fait de mal \u00e0 une mouche, et ils le savent bien.\n[VOUS \u00caTES L'IDIOT DU VILLAGE. VOUS NE POUVEZ PAS MOURIR DU PREMIER COUP AU VOTE]"
+        ],
+        "first_vote_kill": [
+            "Au moment o\u00f9 {player} allait se faire tuer par le bourreau, une protestation s'\u00e9l\u00e9ve de la foule. Puis deux. Puis dix, puis vingt. Ce serait absurde de le tuer, il ne ferait de mal \u00e0 personne, volontairement ou non. [{player} N'A PAS \u00c9T\u00c9 \u00c9LIMIN\u00c9 CAR IL EST L'IDIOT DU VILLAGE]"
+        ],
+        "second_vote_kill": [
+            "{player} reste suspect. Vous le soup\u00e7onnez de poss\u00e9der une autre identit\u00e9, plus dangereuse pour vous. Vous ne pouvez pas prendre ce risque. En cette fin d'apr\u00e8s-midi, son cri r\u00e9sonne alors sur la grand-place."
         ]
     }
 }

@@ -9,9 +9,11 @@ from .seeker import Seeker
 from .hunter import Hunter
 from .lovemaker import LoveMaker
 from .little_girl import LittleGirl
+from .guard import Guard
+from .idiot import Idiot
 
 from .rolegroup import RoleGroup
-from assets.exceptions import CommandPermissionError
+from assets.exceptions import CommandPermissionError, ProtectedPlayer
 import assets.messages as msgs
 
 
@@ -47,17 +49,20 @@ class Roles(dict):
             else:
                 self[_player.name] = role(_player, self.dialogs)
 
+        roles_order = [
+            *([WereWolf]*max_were_wolfs),
+            Witch,
+            Guard,
+            Seeker,
+            LoveMaker,
+            LittleGirl,
+            Idiot,
+            Hunter
+        ]
+
         for i, player in enumerate(players):
-            if i < max_were_wolfs:
-                set_role(player, WereWolf)
-            elif i == max_were_wolfs:
-                set_role(player, Seeker)
-            elif i == max_were_wolfs + 1:
-                set_role(player, Witch)
-            elif i == max_were_wolfs + 2:
-                set_role(player, LoveMaker)
-            elif i == max_were_wolfs + 3:
-                set_role(player, Hunter)
+            if i < len(roles_order):
+                set_role(player, roles_order[i])
             else:
                 set_role(player, Villager)
 
@@ -188,8 +193,26 @@ class Roles(dict):
             if isinstance(r, LittleGirl):
                 return r
 
+    @property
+    def guard(self):
+        """Returns the Guard of this game"""
+        for r in self.players():
+            if isinstance(r, Guard):
+                return r
+
+    @property
+    def idiot(self):
+        for r in self.players():
+            if isinstance(r, Idiot):
+                return r
+
     def wound(self, name):
+        if self[name].protected:
+            raise ProtectedPlayer
         self[name].injured = True
+
+    def protect(self, name):
+        self[name].protected = True
 
     def heal(self, name):
         self[name].injured = False

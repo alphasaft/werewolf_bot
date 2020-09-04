@@ -195,7 +195,7 @@ class _MockedUser(discord.User):
 
         ret = await self.parent.send(**request)
         self._push_history(ret)
-        if embed:
+        if embed and not content:
             embed.title = title
         return ret
 

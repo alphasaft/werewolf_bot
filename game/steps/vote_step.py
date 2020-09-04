@@ -1,5 +1,5 @@
 from game.steps.base_step import BaseStep
-from game.roles import Roles
+from game.roles import Roles, Idiot
 from assets.utils import unpack
 from assets.constants import WHITE_VOTE
 import assets.messages as msgs
@@ -141,9 +141,23 @@ class VoteStep(BaseStep):
                 await BaseStep.end(self, roles, dialogs)
 
         else:  # A player will be killed
-            await roles.everyone.send(dialogs.everyone.player_was_killed_by_vote.tell(
-                player=final_targets[0],
-                role=roles.get_role_by_name(final_targets[0]).role
-            ))
-            await roles.kill(final_targets[0])
+            target_name = final_targets[0]
+            target = roles.get_role_by_name(target_name)
+            if isinstance(target, Idiot) and not target.revealed:
+                await roles.everyone.send(dialogs.idiot.first_vote_kill.tell(
+                    player=target.user.name
+                ))
+                target.revealed = True
+            elif isinstance(target, Idiot):
+                await roles.everyone.send(dialogs.idiot.second_vote_kill.tell(
+                    player=target_name,
+                    role=target.role
+                ))
+                await roles.kill(target_name)
+            else:
+                await roles.everyone.send(dialogs.everyone.player_was_killed_by_vote.tell(
+                    player=target_name,
+                    role=target.role
+                ))
+                await roles.kill(target_name)
             await BaseStep.end(self, roles, dialogs)

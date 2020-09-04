@@ -1,18 +1,72 @@
+import random
+import enum
+
 from .base_step import BaseStep
 from assets.utils import unpack
 from assets.constants import WEREWOLF, LITTLE_GIRL
+from assets.exceptions import ProtectedPlayer
 import assets.messages as msgs
+
+
+class _LittleGirlResults(enum.Enum):
+    CAUGHT_RED_HANDED = enum.auto()
+    NOTHING_HAPPENS = enum.auto()
+    WEREWOLF_SEEN = enum.auto()
+
+
+class _LittleGirlProbabilities(object):
+
+    # Base probabilities
+    CAUGHT_RED_HANDED = range(0, 2)
+    NOTHING_HAPPENS = range(2, 80)
+    WEREWOLF_SEEN = range(80, 100)
+
+    EVOLUTION = (2, 5, 10, 20, 50)
+
+    def __init__(self):
+        self.caught_red_handed = self.CAUGHT_RED_HANDED
+        self.nothing_happens = self.NOTHING_HAPPENS
+        self.werewolf_seen = self.WEREWOLF_SEEN
+
+    def spy(self):
+        result = random.randint(0, 100)
+
+        if result in self.caught_red_handed:
+            ret = _LittleGirlResults.CAUGHT_RED_HANDED
+        elif result in self.nothing_happens:
+            ret = _LittleGirlResults.NOTHING_HAPPENS
+        elif result in self.werewolf_seen:
+            ret = _LittleGirlResults.WEREWOLF_SEEN
+        else:
+            ret = None
+
+        if self.caught_red_handed.stop < 50:
+            new = self.EVOLUTION[self.EVOLUTION.index(self.caught_red_handed.stop)+1]
+            self.caught_red_handed = range(0, new)
+            self.nothing_happens = range(new, 80)
+
+        return ret
 
 
 class WereWolfsStep(BaseStep):
     def __init__(self):
+        # Werewolfs
         self.targeted = None
         self.agree_players = set()
+
+        # Little girl
+        self.probabilities = _LittleGirlProbabilities()
+        self.werewolf_seen = None
+        self.caught_red_handed = False
+
         BaseStep.__init__(
             self,
             active_roles={WEREWOLF, LITTLE_GIRL},
             helps=(
-                "Proposez une cible avec `*kill uneCible`, ou montrez votre approbation avec `*confirm`",
+                "Si vous êtes un loup-garou, proposez une cible avec `*kill uneCible`, ou montrez votre approbation "
+                "avec `*confirm`.\n"
+                "Si vous êtes la petite fille, espionnez-les avec `$spy`. Attention, plus vous espionnerez, plus vous "
+                "aurez de chance de vous faire attraper !",
                 "Les loup-garous choisissent leur prochaine victime..."
             )
         )
@@ -28,6 +82,8 @@ class WereWolfsStep(BaseStep):
 
         await roles.everyone.send(dialogs.werewolf.wakes_up.tell())
         await roles.were_wolfs.only_alive().send(dialogs.werewolf.turn.tell(werewolfs=fmt))
+        if roles.little_girl and roles.little_girl.alive:
+            await roles.little_girl.send(dialogs.little_girl.turn.tell())
 
     async def on_player_quit(self, roles, dialogs):
         if not roles.were_wolfs.only_alive():
@@ -84,8 +140,11 @@ class WereWolfsStep(BaseStep):
 
     async def confirm_cmd(self, args, author, roles, dialogs):
         """ `*confirm` : Confirme que vous êtes d'accord """
-        if not self.targeted:
-            await self.error(to=author, msg=dialogs.werewolf.no_target.tell())
+        try:
+            assert author in roles.were_wolfs, "Vous n'êtes pas un loup-garou !"
+            assert self.targeted, dialogs.werewolf.no_target.tell()
+        except Exception as e:
+            await self.error(to=author, msg=str(e))
             return
 
         self.agree_players.add(author)
@@ -110,11 +169,32 @@ class WereWolfsStep(BaseStep):
         await author.send(embed=msgs.GET_WEREWOLFS.build(
             werewolfs=",\n- ".join(roles.get_name_by_id(w.id) for w in roles.were_wolfs.only_alive()),
             target=self.targeted or "encore personne",
-            agree=", ".join(roles.get_role_by_id(w.id) for w in self.agree_players) if self.agree_players else "encore personne"
+
+            agree=", ".join(roles.get_name_by_id(w.id) for w in self.agree_players) if self.agree_players else "encore personne"
         ))
 
     async def spy_cmd(self, args, author, roles, dialogs):
-        ...
+        """ `*spy` : Espionne les loup-garous. Attention à ne pas vous faire attraper !"""
+
+        try:
+            assert roles.little_girl and author == roles.little_girl, "Vous n'êtes pas la petite fille !"
+            assert not self.werewolf_seen, dialogs.little_girl.werewolf_already_seen.tell(werewolf=self.werewolf_seen)
+            assert not self.caught_red_handed, dialogs.little_girl.already_caught.tell()
+        except Exception as e:
+            await self.error(to=author, msg=str(e))
+            return
+        
+        result = self.probabilities.spy()
+
+        if result == _LittleGirlResults.WEREWOLF_SEEN:
+            self.werewolf_seen = roles.were_wolfs.only_alive().random()
+            await author.send(dialogs.little_girl.werewolf_seen.tell(werewolf=self.werewolf_seen.user.name))
+        elif result == _LittleGirlResults.NOTHING_HAPPENS:
+            await author.send(dialogs.little_girl.nothing_happens.tell())
+        elif result == _LittleGirlResults.CAUGHT_RED_HANDED:
+            self.caught_red_handed = True
+            await author.send(dialogs.little_girl.caught_red_handed.tell())
+            await roles.were_wolfs.send(dialogs.little_girl.little_girl_caught.tell(little_girl=author.user.name))
 
     async def external_quit_cmd(self, args, author, roles, dialogs, session):
         """ `*quit` : Quitte définitivement la partie """
@@ -123,7 +203,10 @@ class WereWolfsStep(BaseStep):
         await BaseStep.external_quit_cmd(self, args, author, roles, dialogs, session)
 
     async def end(self, roles, dialogs):
-        roles.wound(self.targeted)
-        await roles.were_wolfs.send(dialogs.werewolf.done.tell(target=self.targeted))
+        try:
+            roles.wound(self.targeted)
+            await roles.were_wolfs.send(dialogs.werewolf.done.tell(target=self.targeted))
+        except ProtectedPlayer:
+            await roles.were_wolfs.send(dialogs.werewolf.target_protected.tell(target=self.targeted))
         await roles.everyone.send(dialogs.werewolf.go_to_sleep.tell())
         await BaseStep.end(self, roles, dialogs)
