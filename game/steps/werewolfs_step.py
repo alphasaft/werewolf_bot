@@ -9,9 +9,9 @@ import assets.messages as msgs
 
 
 class _LittleGirlResults(enum.Enum):
-    CAUGHT_RED_HANDED = enum.auto()
-    NOTHING_HAPPENS = enum.auto()
-    WEREWOLF_SEEN = enum.auto()
+    CAUGHT_RED_HANDED = 0
+    NOTHING_HAPPENS = 1
+    WEREWOLF_SEEN = 2
 
 
 class _LittleGirlProbabilities(object):
