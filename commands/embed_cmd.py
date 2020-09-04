@@ -11,7 +11,7 @@ def __implement__(bot):
     @discord.ext.commands.has_permissions(manage_messages=True)
     async def create_embed(ctx, *options):
 
-        _AVAILABLE_OPTIONS = {'title', 'content', 'color'}
+        _AVAILABLE_OPTIONS = {'title', 'content', 'color', 'footer'}
 
         if options == ():
             options = _AVAILABLE_OPTIONS
@@ -19,7 +19,7 @@ def __implement__(bot):
         # Command processing
         invalid = set(options) - set(_AVAILABLE_OPTIONS)
         if invalid:
-            await ctx.channel.send("Invalid option(s) %s" % ", ".join(options))
+            await ctx.channel.send("Invalid option(s) %s" % ", ".join(invalid))
             return
 
         values = {}
