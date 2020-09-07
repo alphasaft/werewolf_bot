@@ -79,7 +79,7 @@ class Session(StateOwner):
         if self.ended():
             return
 
-        while self.steps.current_step.ended:
+        while self.steps.current_step.ended and not self.steps.ended:
             sleep(1)
             await self.steps.next_step(self.roles, self.dialogs)
 

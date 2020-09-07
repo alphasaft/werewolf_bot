@@ -94,6 +94,23 @@ async def event_checking():
         event_checking.close()
 
 
+@tasks.loop(minutes=1.0)
+async def top_players_updating():
+    try:
+        top_xps = sorted({xp for _id, xp in bot.xp_counts.values() if bot.get_level_info(_id)['level'] >= 3})[-5:]
+        for _id, xp in bot.xp_counts:
+            member = bot.get_user(_id)
+            roles = bot.get_guild(consts.GUILD).roles
+            role = discord.utils.get(roles, name=consts.TOP_PLAYER_ROLE, reason="Role de base du village")
+            if xp in top_xps:
+                await member.add_roles(role)
+            elif role in member.roles():
+                await member.remove_roles(role)
+    except BaseException as e:
+        logger.error(e.__class__.__name__, str(e))
+        top_players_updating.close()
+
+
 if __name__ == '__main__':
     try:
         logger.info("Process started")

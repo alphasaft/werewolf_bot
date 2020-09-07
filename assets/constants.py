@@ -12,6 +12,7 @@ WELCOME_CHANNEL = 726114430093623308
 EVENTS_CHANNEL = 744228828867723476
 EXPEDITIONS_CATEGORY = "EXPEDITIONS"
 BASE_ROLE = "Manant"
+TOP_PLAYER_ROLE = "Chasseur pro"
 
 
 TIMEZONE = timezone(timedelta(hours=2), "France")  # Your time zone here
@@ -38,12 +39,20 @@ ALLTIMES_CMDS = (
     'skip',
     'destroy',
 )
-
-LEVELS = {
-    1: "Nouvel arrivant",
-    2: "Apprenti",
-    3: "Citoyen",
-}
+LEVELS = (
+    "Nouvel arrivant",
+    "Paysan",
+    "Villageois"
+    "Citoyen",
+    "Marchand",
+    "Forgeron",
+    "Novice en chasse",
+    "Apprenti chasseur"
+    "Chasseur confirmé",
+    "Spécialiste en chasse",
+    "Expert en chasse",
+    "Virtuose en chasse"
+)
 
 # Roles
 

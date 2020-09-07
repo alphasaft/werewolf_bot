@@ -15,13 +15,16 @@ class EndStep(BaseStep):
             helps=(
                 "Utilisez `$quit` pour quitter la partie, ou discutez avec vos amis",
                 "Utilisez `$quit` pour quitter la partie, ou discutez avec vos amis"  # help for the dead players
-            ))
+            )
+        )
+
+        self.xp_counts = {}
 
     async def start(self, roles: Roles, dialogs):
         roles_summary = "- "+",\n- ".join([name+': '+role.role for name, role in roles.items()])
 
         for player in roles.everyone:
-            player.gain_xp(100)
+            player.gain_xp(30)
 
         if (len(roles.alive_players) == 2 and list(roles.alive_players)[0].loving == list(roles.alive_players)[1] and
                 (list(roles.alive_players)[0].role == WEREWOLF) ^ (list(roles.alive_players)[1].role == WEREWOLF)):
@@ -42,10 +45,16 @@ class EndStep(BaseStep):
             await roles.everyone.send(dialogs.everyone.werewolfs_won.tell(roles=roles_summary))
 
         for player in roles.alive_players:
-            player.gain_xp(100)
+            player.gain_xp(30)
             player.set_xp_to_minimal()
 
         await roles.everyone.send(dialogs.everyone.game_ended.tell())
+
+    async def external_quit_cmd(self, args, author, roles, dialogs, session):
+        EndStep.external_quit_cmd.__doc__ = BaseStep.external_quit_cmd.__doc__  # Copying base doc
+
+        self.xp_counts[author.id] = author.xp
+        await BaseStep.external_quit_cmd(self, args, author, roles, dialogs, session)
 
     async def on_player_join(self, player, roles, dialogs):
         await self.info(roles.everyone.exclude(player.id), msgs.SOMEONE_JOINED_THE_ACTIVE_GAME % player.display_name)

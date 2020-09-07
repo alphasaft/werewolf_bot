@@ -309,10 +309,11 @@ class GameMaster(ExtendedBot):
                     await self.finish_game(name)
 
     async def finish_game(self, name):
-        for user in self.games[name].roles.everyone:
-            if not self.xp_counts.get(user.id):
-                self.create_xp_account(user.id)
-            self.xp_counts[user.id] += user.xp
+        self.games[name].players.values()
+        for _id, xp in self.games[name].steps.xp_counts.items():
+            if not self.xp_counts.get(_id):
+                self.create_xp_account(_id)
+            self.xp_counts[_id] += xp
 
         await self.voice_channels.pop(name).delete()
         await self.games[name].home_channel.send(msgs.GAME_HAS_ENDED % name)

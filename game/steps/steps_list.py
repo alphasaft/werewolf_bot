@@ -65,3 +65,7 @@ class StepList:
     @property
     def ended(self):
         return self._end_step.ended
+
+    @property
+    def xp_counts(self):
+        return self._end_step.xp_counts
