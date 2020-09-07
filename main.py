@@ -27,18 +27,18 @@ commands.clear_cmd.__implement__(bot)
 commands.kick_cmd.__implement__(bot)
 commands.embed_cmd.__implement__(bot)
 commands.tests_cmd.__implement__(bot)
+commands.level_cmd.__implement__(bot)
 
 
 # Implementing events
 @bot.event
 async def on_ready():
     logger.info("Ready as %s with id %s" % (bot.user.name, bot.user.id))
-    if not bot.events:
-        try:
-            bot.load_events(consts.EVENTS_PATH)
-            logger.info("Loaded %i event(s)" % len(bot.events))
-        except (SyntaxError, FileNotFoundError):
-            logger.warn("Event loading failed")
+    try:
+        bot.load(consts.EVENTS_PATH, consts.XP_COUNTS_PATH)
+        logger.info("Loaded %i event(s) and %s user(s) xp account(s)" % (len(bot.events), len(bot.xp_counts)))
+    except (SyntaxError, FileNotFoundError):
+        logger.warn("Data loading failed")
 
 
 @bot.event
@@ -105,6 +105,6 @@ if __name__ == '__main__':
         logger.critical("Killed by %s : %s" % (e.__class__.__name__, e))
     finally:
         bot.dialogs.save(consts.DIALOGS_PATH)
-        bot.dump_events(consts.EVENTS_PATH)
+        bot.dump(consts.EVENTS_PATH, consts.XP_COUNTS_PATH)
 
         logger.info("Process ended")

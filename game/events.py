@@ -342,20 +342,22 @@ class GameEvent(Event):
             aft_remainder_desc=aft_remainder_desc % (name, smiley)
         )
 
+    """
+
     @property
     def game_name(self):
         return '.'+self.name
 
     async def activate(self, bot):
-        """We create a game that has the same name as the event, and we inform the event members about it"""
+        \"""We create a game that has the same name as the event, and we inform the event members about it\"""
         bot.add_game(self.game_name, self.admin, self.home_channel)
         await self.home_channel.send(msgs.GAME_CREATED_BY_EVENT % (self.name, self.name))
 
     async def on_presence_confirm(self, user, where, bot):
-        """
+        \"""
         We just force the user to join the game, and if he's the admin of the event, we grant him the admin
         permission for the game too
-        """
+        \"""
         bot.join_game(self.game_name, user)
 
         if user == self.admin:
@@ -365,3 +367,5 @@ class GameEvent(Event):
             bot.set_admin(self.game_name, user.id)
 
         await where.send(msgs.GAME_JOINED_BY_EVENT % (self.game_name, self.game_name))
+
+    """

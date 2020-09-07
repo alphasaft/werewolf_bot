@@ -5,4 +5,6 @@ venv
 
 assets/token.py
 data/events.xml
+data/xp_counts.xml
+
 .gitignore

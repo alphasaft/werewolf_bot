@@ -428,6 +428,16 @@ rapidement relayé aux développeurs afin de le résoudre.
 """
 
 
+# LEVEL
+
+GET_LEVEL = _EmbedSkeleton(
+    title="Niveau {level} : {level_name}",
+    content="[{xp_bar}] {gained_xp}/{total_xp} xP",
+    footer="Encore {needed_xp} xP pour atteindre le niveau suivant !",
+    color="green",
+)
+
+
 # EVENTS
 
 GAME_CREATED_BY_EVENT = """

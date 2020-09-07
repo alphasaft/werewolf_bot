@@ -117,28 +117,62 @@ class _XmlEventsIO(object):
         return cls(events)
 
 
+class _XmlExperienceIO(object):
+    def __init__(self, xp_counts):
+        self.xp_counts = xp_counts
+
+    def dump(self, file: str):
+        root = etree.Element("xp_counts")
+
+        for user_id, xp in self.xp_counts.items():
+            print(user_id)
+            user_xp = etree.SubElement(root, "user_xp")
+            user_xp.set("id", str(user_id))
+            user_xp.set("xp", str(xp))
+
+        with open(file, 'w') as f:
+            f.write(etree.tostring(root, pretty_print=True).decode("utf-8"))
+
+    @classmethod
+    def load(cls, file: str, bot):
+        xp_counts = {}
+        root = etree.parse(file)
+
+        for user_xp in root.findall("user_xp"):
+            xp_counts[int(user_xp.get("id"))] = int(user_xp.get("xp"))
+
+        return cls(xp_counts)
+
+
 class GameMaster(ExtendedBot):
-    def __init__(self, games=None, events=None, *args, **kwargs):
+    def __init__(self, games=None, events=None, xp_counts=None, *args, **kwargs):
         self.games = games or {}
         self.events = events or {}
+        self.xp_counts = xp_counts or {}
 
         self.dialogs = StoryBook(consts.DIALOGS_PATH)
         self.voice_channels = {}
         ExtendedBot.__init__(self, *args, **kwargs)
 
-    def load_events(self, file):
-        """Loads the events from a .xml file."""
-        try:
-            self.events = {**_XmlEventsIO.load(file, bot=self).events, **self.events}
-        except (FileNotFoundError, etree.XMLSyntaxError) as e:
-            raise SyntaxError from e
+    def load(self, events_file, xp_counts_file):
+        def _load_events():
+            self.events = {**_XmlEventsIO.load(events_file, bot=self).events, **self.events}
 
-    def dump_events(self, file):
-        """
-        Dumps self.events into the file using a specific format. The dumped events can be loaded using
-        GameMaster(...).load_events(file)
-        """
-        _XmlEventsIO(self.events).dump(file)
+        def _load_xps():
+            self.xp_counts = {**_XmlExperienceIO.load(xp_counts_file, bot=self).xp_counts, **self.xp_counts}
+
+        failed = False
+        for data_load in (_load_events, _load_xps):
+            try:
+                data_load()
+            except (SyntaxError, FileNotFoundError) as exc:
+                failed = exc
+        if failed:
+            raise SyntaxError from failed
+
+    def dump(self, events_file, xp_counts_file):
+        _XmlEventsIO(self.events).dump(events_file)
+        _XmlExperienceIO(self.xp_counts).dump(xp_counts_file)
 
     # - - - Checks - - -
     def check_game_exists(self, name: str, err_msg: str = None):
@@ -272,9 +306,17 @@ class GameMaster(ExtendedBot):
                 await game.react(msg)
 
                 if game.ended():
-                    await self.voice_channels.pop(name).delete()
-                    self.games.pop(name)
-                    await game.home_channel.send(msgs.GAME_HAS_ENDED % name)
+                    await self.finish_game(name)
+
+    async def finish_game(self, name):
+        for user in self.games[name].roles.everyone:
+            if not self.xp_counts.get(user.id):
+                self.create_xp_account(user.id)
+            self.xp_counts[user.id] += user.xp
+
+        await self.voice_channels.pop(name).delete()
+        await self.games[name].home_channel.send(msgs.GAME_HAS_ENDED % name)
+        self.games.pop(name)
 
     # - - - Events - - -
     def add_game_event(self, when, name, admin, home_channel):
@@ -298,5 +340,31 @@ class GameMaster(ExtendedBot):
             if event.over():
                 self.events.pop(name)
 
+    # - - - Experience points - - -
+    def create_xp_account(self, user_id):
+        self.xp_counts[user_id] = 0
 
+    def get_level_info(self, user_id):
+        xp = self.xp_counts[user_id]
+        level = 1
 
+        def _level_total_xp():
+            return (level + 1) * 50
+
+        while _level_total_xp() <= xp:
+            xp -= _level_total_xp()
+            level += 1
+
+        level_name = consts.LEVELS[level]
+        total_xp = _level_total_xp()
+        needed_xp = total_xp - xp
+        xp_bar = "■"*(int(xp/total_xp*10)) + "□"*(int(needed_xp/total_xp*10))
+
+        return {
+            "level": level,
+            "level_name": level_name,
+            "total_xp": total_xp,
+            "xp": xp,
+            "needed_xp": needed_xp,
+            "xp_bar": xp_bar
+        }

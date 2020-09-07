@@ -20,13 +20,30 @@ TIMEZONE = timezone(timedelta(hours=2), "France")  # Your time zone here
 
 DIALOGS_PATH = "data/story.json"
 EVENTS_PATH = "data/events.xml"
-MINIMUM_PLAYERS = 4
+XP_COUNTS_PATH = "data/xp_counts.xml"
+MINIMUM_PLAYERS = 1
+WHITE_VOTE = "Vote blanc"
 ALLTIMES_CMDS = (
-    'admin', 'players', 'private', 'public', 'quit', 'commands', 'role', 'help', 'votes', 'again', 'kick', 'skip',
+    'admin',
+    'players',
+    'private',
+    'public',
+    'quit',
+    'commands',
+    'role',
+    'help',
+    'votes',
+    'again',
+    'kick',
+    'skip',
     'destroy',
 )
-WHITE_VOTE = "Vote blanc"
 
+LEVELS = {
+    1: "Nouvel arrivant",
+    2: "Apprenti",
+    3: "Citoyen",
+}
 
 # Roles
 

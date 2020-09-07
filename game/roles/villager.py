@@ -12,6 +12,8 @@ class Villager:
         self.dialogs = dialogs
         self.role = role
 
+        self.xp = 0
+
     def __repr__(self):
         return '< %s : %s >' % (self.user.mention, type(self).__name__)
 
@@ -48,3 +50,13 @@ class Villager:
 
         if self.loving and not self.loving.injured and not from_lover:
             await roles.kill(roles.get_name_by_role(self.loving), from_lover=True)
+
+    def gain_xp(self, n):
+        self.xp += n
+
+    def lose_xp(self, n):
+        self.xp -= n
+
+    def set_xp_to_minimal(self):
+        if self.xp < 0:
+            self.xp = 0
