@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import discord
 import discord.ext.tasks as tasks
+import traceback
 
 from bot import GameMaster
 from assets.utils import assure_assertions, configure_logger
@@ -9,6 +10,7 @@ import assets.token as token
 import assets.messages as msgs
 import assets.constants as consts
 import commands
+
 
 # Checking that assertion will work.
 assure_assertions()
@@ -87,21 +89,24 @@ async def on_member_join(member):
 
 @tasks.loop(minutes=1.0)
 async def bot_updating():
-    try:
-        await bot.activate_events()
+    if not bot.is_ready():
+        return
 
-        top_xps = sorted({xp for _id, xp in bot.xp_counts.values() if bot.get_level_info(_id)['level'] >= 3})[-5:]
+    try:
+        # await bot.activate_events()
+        top_xps = sorted({xp for _id, xp in bot.xp_counts.items() if bot.get_level_info(_id)['level'] >= 3})[-5:]
+        guild = bot.get_guild(consts.GUILD)
+        roles = guild.roles
+        role = discord.utils.get(roles, name=consts.TOP_PLAYER_ROLE)
         for _id, xp in bot.xp_counts.items():
-            member = bot.get_user(_id)
-            roles = bot.get_guild(consts.GUILD).roles
-            role = discord.utils.get(roles, name=consts.TOP_PLAYER_ROLE)
+            member = discord.utils.get(guild.members, id=_id)
             if xp in top_xps:
                 await member.add_roles(role)
-            elif role in member.roles():
+            elif role in member.roles:
                 await member.remove_roles(role)
 
     except BaseException as e:
-        logger.error(e.__class__.__name__, str(e))
+        logger.error("%s %s : %s" % ("".join(traceback.format_tb(e.__traceback__)), e.__class__.__name__, str(e)))
         bot_updating.close()
 
 
