@@ -158,6 +158,9 @@
         "game_ended": [
             "C'est la fin de cette partie ! En esp\u00e8rant que vous avez aim\u00e9 ! Vous pouvez discuter un peu, puis partir avec $quit, ou red\u00e9marrer une partie avec $again. La partie sera d\u00e9truite lorque tout le monde l'aura quitt\u00e9e."
         ],
+        "gained_xp": [
+            "Vous avez gagn\u00e9 {xp} points d'exp\u00e9rience durant cette partie !"
+        ],
         "first_sleep": [
             "La journ\u00e9e a \u00e9t\u00e9 tr\u00e8s \u00e9puisante, et vous n'avez qu'une envie, dormir. Mais vous savez au fond de vous que cette nuit ne sera pas reposante... Vous mettez ces pressentiments de cot\u00e9 et vous vous couchez bien au chaud, sous votre couette."
         ],

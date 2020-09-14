@@ -86,29 +86,23 @@ async def on_member_join(member):
 
 
 @tasks.loop(minutes=1.0)
-async def event_checking():
+async def bot_updating():
     try:
         await bot.activate_events()
-    except BaseException as e:
-        logger.error(e.__class__.__name__, str(e))
-        event_checking.close()
 
-
-@tasks.loop(minutes=1.0)
-async def top_players_updating():
-    try:
         top_xps = sorted({xp for _id, xp in bot.xp_counts.values() if bot.get_level_info(_id)['level'] >= 3})[-5:]
-        for _id, xp in bot.xp_counts:
+        for _id, xp in bot.xp_counts.items():
             member = bot.get_user(_id)
             roles = bot.get_guild(consts.GUILD).roles
-            role = discord.utils.get(roles, name=consts.TOP_PLAYER_ROLE, reason="Role de base du village")
+            role = discord.utils.get(roles, name=consts.TOP_PLAYER_ROLE)
             if xp in top_xps:
                 await member.add_roles(role)
             elif role in member.roles():
                 await member.remove_roles(role)
+
     except BaseException as e:
         logger.error(e.__class__.__name__, str(e))
-        top_players_updating.close()
+        bot_updating.close()
 
 
 if __name__ == '__main__':
@@ -116,7 +110,7 @@ if __name__ == '__main__':
         logger.info("Process started")
 
         # Launch the bot
-        event_checking.start()
+        bot_updating.start()
         bot.run(token.TOKEN)
     except BaseException as e:
         logger.critical("Killed by %s : %s" % (e.__class__.__name__, e))

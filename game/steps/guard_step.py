@@ -23,6 +23,10 @@ class GuardStep(BaseStep):
         await roles.everyone.send(dialogs.guard.wakes_up.tell())
         await roles.guard.send(dialogs.guard.turn.tell())
 
+    async def on_player_quit(self, roles, dialogs):
+        if not (roles.guard and roles.guard.alive):
+            await BaseStep.end(self, roles, dialogs)
+
     async def protect_cmd(self, args, author, roles, dialogs):
         """ `*protect unJoueur` : protège ce joueur """
         try:

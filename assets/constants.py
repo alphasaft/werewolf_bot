@@ -42,7 +42,7 @@ ALLTIMES_CMDS = (
 LEVELS = (
     "Nouvel arrivant",
     "Paysan",
-    "Villageois"
+    "Villageois",
     "Citoyen",
     "Marchand",
     "Forgeron",

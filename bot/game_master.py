@@ -264,7 +264,7 @@ class GameMaster(ExtendedBot):
         return self.events[name]
 
     def get_opened_games(self):
-        return [name for name in self.games.keys() if self.is_active(name)]
+        return [name for name in self.games.keys() if not self.is_active(name)]
 
     def get_opened_events(self):
         return [(name, event.dt) for name, event in self.events.items()]

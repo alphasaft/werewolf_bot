@@ -23,9 +23,6 @@ class EndStep(BaseStep):
     async def start(self, roles: Roles, dialogs):
         roles_summary = "- "+",\n- ".join([name+': '+role.role for name, role in roles.items()])
 
-        for player in roles.everyone:
-            player.gain_xp(30)
-
         if (len(roles.alive_players) == 2 and list(roles.alive_players)[0].loving == list(roles.alive_players)[1] and
                 (list(roles.alive_players)[0].role == WEREWOLF) ^ (list(roles.alive_players)[1].role == WEREWOLF)):
             await roles.everyone.send(dialogs.everyone.lovers_won.tell(
@@ -33,20 +30,30 @@ class EndStep(BaseStep):
                 lover2=roles.get_name_by_id(list(roles.alive_players)[1].id),
                 roles=roles_summary
             ))
+            winners = roles.alive_players
 
         elif not roles.alive_players:
             await roles.everyone.send(dialogs.everyone.nobody_won.tell(roles=roles_summary))
+            winners = ()
             await self.end(roles, dialogs)
 
         elif roles.alive_players == roles.villagers.only_alive():
             await roles.everyone.send(dialogs.everyone.villagers_won.tell(roles=roles_summary))
+            winners = roles.villagers
 
         elif roles.alive_players == roles.were_wolfs.only_alive():
             await roles.everyone.send(dialogs.everyone.werewolfs_won.tell(roles=roles_summary))
+            winners = roles.were_wolfs
 
-        for player in roles.alive_players:
+        else:
+            winners = ()
+
+        for player in roles.everyone:
             player.gain_xp(30)
+            if player in winners:
+                player.gain_xp(30)
             player.set_xp_to_minimal()
+            player.send(dialogs.everyone.gained_xp.tell(xp=player.xp))
 
         await roles.everyone.send(dialogs.everyone.game_ended.tell())
 
