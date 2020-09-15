@@ -437,6 +437,13 @@ GET_LEVEL = _EmbedSkeleton(
     color="green",
 )
 
+GET_RANKS = _EmbedSkeleton(
+    title="Rang des villageois",
+    content="{ranks}",
+    footer="Participe à des parties pour y grimper !",
+    color="green"
+)
+
 
 # EVENTS
 
